@@ -35,10 +35,14 @@ class Browser:
             res = self.session.get(urls.modules())
             soup = BeautifulSoup(res.text, PARSER)
             table = soup.select_one("#ewlistmain")
+            if not table:
+                raise Exception("table cannot be null")
             table_data = read_table(table)
             data = []
             for it in table_data:
                 link = find_link_in_table(table, it[0], "GradeBook")
+                if not link:
+                    raise Exception("link cannot be null")
                 id = link[link.find("ModuleID"):]
                 if id:
                     id = id[id.find("=")+1:]

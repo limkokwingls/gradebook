@@ -1,10 +1,11 @@
+from genericpath import isfile
 from rich.prompt import Prompt
 from pick import pick
-from pip import main
 from browser import Browser
 from rich.prompt import Confirm
 from rich.console import Console
 from rich.prompt import Prompt
+from pathlib import Path
 
 console = Console()
 error_console = Console(stderr=True, style="bold red")
@@ -12,9 +13,9 @@ browser = Browser()
 
 
 def login():
-    with open('credentials', 'r') as f:
-        credentials = f.read().splitlines()
-    if credentials:
+    if Path('credentials').is_file():
+        with open('credentials', 'r') as f:
+            credentials = f.read().splitlines()
         username = credentials[0]
         password = credentials[1]
     else:

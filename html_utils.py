@@ -24,5 +24,6 @@ def find_link_in_table(table: Tag, search_key: str, target_link_text: str):
                 col = cols[i]
                 text = col.get_text(strip=True)
                 anchor = col.findChild("a")
-                if(text == target_link_text):
-                    return anchor.attrs["href"]
+                if isinstance(anchor, Tag):
+                    if (text == target_link_text):
+                        return anchor.attrs["href"]
