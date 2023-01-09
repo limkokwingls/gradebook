@@ -1,4 +1,3 @@
-from genericpath import isfile
 from rich.prompt import Prompt
 from pick import pick
 from browser import Browser
