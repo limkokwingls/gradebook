@@ -7,6 +7,7 @@ from rich.console import Console
 from rich.prompt import Prompt
 from pathlib import Path
 from console_utils import print_in_table
+from credentials import read_credentials, write_credentials
 from excel_reader import get_grades, get_worksheet, open_file
 from model import CourseWork
 
@@ -16,14 +17,13 @@ browser = Browser()
 
 
 def login():
-    if Path('credentials').is_file():
-        with open('credentials', 'r') as f:
-            credentials = f.read().splitlines()
-        username = credentials[0]
-        password = credentials[1]
+    credentials = read_credentials()
+    if credentials:
+        username, password = credentials
     else:
         username = Prompt.ask("Username")
         password = Prompt.ask("Password", password=True)
+        write_credentials(username, password)
 
     browser.login(username, password)
 
@@ -65,7 +65,6 @@ def main():
         course_work, _ = pick(course_works, "Pick Assessment",
                               indicator='->', )  # type: ignore
         print()
-
         print_in_table({
             "Confirm": ['Module', 'Course Work', 'Number of Students'],
             "": [str(module), str(course_work), str(len(student_ids))],
