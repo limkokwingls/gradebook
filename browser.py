@@ -49,3 +49,25 @@ class Browser:
                 module = Module(id=id, name=it[1])
                 data.append(module)
             return data
+
+
+    def get_std_module_ids(self, module):
+        with console.status(f"Loading Modules..."):
+            res = self.session.get(urls.student_numbers(module))
+            soup = BeautifulSoup(res.text, PARSER)
+            table = soup.select_one("#ewlistmain")
+            if not table:
+                raise Exception("table cannot be null")
+            table_data = read_table(table)
+            data = []
+            for it in table_data:
+                link = find_link_in_table(table, it[0], "Chg")
+                if not link:
+                    raise Exception("link cannot be null")
+                id = link[link.find("ModuleID"):]
+                if id:
+                    id = id[id.find("=")+1:]
+                data.append({
+                    it[4]: id
+                })
+        return data

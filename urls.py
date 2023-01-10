@@ -16,3 +16,6 @@ def modules():
 
 def grade_books(module: Module):
     return f"{_url}/f_breakdownmarksviewlist_new.php?showmaster=1&ModuleID={module.id}"
+
+def student_numbers(module: Module):
+    return f"{_url}/f_breakdownmarksviewlist_old.php?showmaster=1&RecPerPage=500&ModuleID={module.id}"

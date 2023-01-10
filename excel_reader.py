@@ -65,7 +65,7 @@ def get_grades(sheet: Worksheet):
 
         for grade in grades_book:
             if is_number(grade[0]) and is_number(grade[1]):
-                result.append([int(float(grade[0])), int(grade[1])])
+                result.append((int(float(grade[0])), int(grade[1])))
 
         print_in_table({
             "Student No": [str(result[0][0])],

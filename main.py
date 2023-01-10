@@ -26,18 +26,20 @@ def login():
 
 
 def main():
-    # while not browser.logged_in:
-    #     try_function(login)
+    while not browser.logged_in:
+        try_function(login)
 
-    # module_list = browser.get_modules()
-    # module, _ = pick(module_list, "Pick Module", indicator='->')
+    module_list = browser.get_modules()
+    module, _ = pick(module_list, "Pick Module", indicator='->') #type: ignore
 
-    # print(module)
+    student_ids = browser.get_std_module_ids(module)
 
-    workbook = open_file()
-    sheet = get_worksheet(workbook)
-    grades = get_grades(sheet)
-    print(grades)
+    print(student_ids)
+
+    # workbook = open_file()
+    # sheet = get_worksheet(workbook)
+    # grades = get_grades(sheet)
+    # print(grades)
 
 
 
