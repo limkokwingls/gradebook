@@ -31,7 +31,6 @@ class Browser:
                 token.attrs['name']: token.attrs["value"]
             }
             self.session.post(urls.login, payload)
-            console.print("Login Successful", style="green")
             self.logged_in = True
 
     def upload_grades(self, course_work: CourseWork, grade_payload: list):

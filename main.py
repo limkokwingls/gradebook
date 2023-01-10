@@ -44,6 +44,7 @@ def main():
     module_list = browser.get_modules()
     module, _ = pick(module_list, "Pick Module",  # type: ignore
                      indicator='->')
+    console.print(module, style="green")
 
     student_ids, course_works = browser.get_std_module_ids_and_course_works(
         module)
