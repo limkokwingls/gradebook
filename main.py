@@ -70,7 +70,8 @@ def main():
             "": [str(module), str(course_work), str(len(student_ids))],
         })
 
-        proceed = Confirm.ask("Ready to rumble, proceed?", default=True)
+        proceed = Confirm.ask(
+            "I'm ready to rumble, should I proceed?", default=True)
 
     browser.upload_grades(course_work, payload)  # type: ignore
 

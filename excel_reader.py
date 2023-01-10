@@ -55,6 +55,7 @@ def get_grades(sheet: Worksheet) -> list[dict[str, str]]:
     result = []
 
     while retry:
+        result = []
         student_col = Prompt.ask("Enter Column Student No", default='C')
         marks_col = Prompt.ask("Enter Column Marks", default='D')
 
