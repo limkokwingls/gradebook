@@ -53,11 +53,11 @@ def main():
             (id[1], marks)
         )
     
-    course_work = int(Prompt.ask("Course Work No", default=1))
+    course_work = Prompt.ask("Course Work No", default='1')
 
     # proceed = Confirm.ask("Ready to rumble, proceed?", default=True)
 
-    browser.upload_grades(course_work, payload)
+    browser.upload_grades(int(course_work), payload)
 
 
 

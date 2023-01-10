@@ -1,9 +1,11 @@
+from pprint import pprint
 from bs4 import BeautifulSoup
 import requests
 from model import Module
 import urls
 from rich.console import Console
 from html_utils import find_link_in_table, read_table
+import subprocess
 
 console = Console()
 
@@ -33,7 +35,7 @@ class Browser:
     def upload_grades(self, course_work_number: int, grade_payload: list):
         course_work = f"cw{course_work_number}"
         with console.status("Uploading marks..."):
-            res = self.session.get(urls.course_work_update(course_work))
+            res = self.session.get(urls.course_work_page(course_work))
             page = BeautifulSoup(res.text, PARSER)
             form = page.select_one("#ff_breakdownmarksviewlist")
             if not form:
@@ -50,8 +52,9 @@ class Browser:
             payload['x_CW1[]'] = marks
             payload['cw'] = course_work
 
-            print(payload)
-            # self.session.post(urls.course_work_update(course_work), payload)
+            # res = self.session.post(urls.course_work_upload(), payload)
+            # print(payload)
+            # subprocess.run("clip", text=True, input=res.text)
             console.print("Done 😃", style="green")
 
 
@@ -71,7 +74,7 @@ class Browser:
                 id = link[link.find("ModuleID"):]
                 if id:
                     id = id[id.find("=")+1:]
-                module = Module(id=id, name=it[1])
+                module = Module(id=id, code=it[0], name=it[1])
                 data.append(module)
             return data
 
