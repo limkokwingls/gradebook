@@ -1,4 +1,3 @@
-import imp
 from pathlib import Path
 from pprint import pprint
 from types import NoneType
@@ -30,8 +29,8 @@ def open_file() -> Workbook:
     workbook: Workbook | None = None
     while workbook == None:
         try:
-            file_path = Prompt.ask("Workbook file path",
-                                   default="C:/Users/Temp/Desktop/test.xlsx")
+            file_path = Prompt.ask("RAW Mark-sheet")
+            file_path = file_path.strip('\"')
             if Path(file_path).is_file():
                 workbook = openpyxl.load_workbook(file_path)
         except Exception as e:
@@ -56,8 +55,12 @@ def get_grades(sheet: Worksheet) -> list[dict[str, str]]:
 
     while retry:
         result = []
-        student_col = Prompt.ask("Enter Column Student No", default='C')
-        marks_col = Prompt.ask("Enter Column Marks", default='D')
+        student_col = Prompt.ask("Student No Column", default='C')
+        marks_col = Prompt.ask("Marks Column")
+
+        if not student_col.isalpha() or not marks_col.isalpha():
+            error_console.print("Column should be an alphabet")
+            continue
 
         student_numbers = list([it.value for it in sheet[student_col]])
         marks = list([it.value for it in sheet[marks_col]])
