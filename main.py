@@ -1,5 +1,3 @@
-from pprint import pprint
-import turtle
 from rich.prompt import Prompt
 from pick import pick
 from browser import Browser
@@ -47,8 +45,6 @@ def main():
     workbook = open_file()
     sheet = get_worksheet(workbook)
     grades = get_grades(sheet)
-
-    # proceed = Confirm.ask("Ready to rumble, proceed?", default=True)
     
     payload = []
     for id in student_ids:
@@ -56,9 +52,12 @@ def main():
         payload.append(
             (id[1], marks)
         )
+    
+    course_work = int(Prompt.ask("Course Work No", default=1))
 
-    pprint(payload)
+    # proceed = Confirm.ask("Ready to rumble, proceed?", default=True)
 
+    browser.upload_grades(course_work, payload)
 
 
 

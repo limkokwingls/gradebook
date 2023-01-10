@@ -30,6 +30,31 @@ class Browser:
             console.print("Login Successful", style="green")
             self.logged_in = True
 
+    def upload_grades(self, course_work_number: int, grade_payload: list):
+        course_work = f"cw{course_work_number}"
+        with console.status("Uploading marks..."):
+            res = self.session.get(urls.course_work_update(course_work))
+            page = BeautifulSoup(res.text, PARSER)
+            form = page.select_one("#ff_breakdownmarksviewlist")
+            if not form:
+                raise Exception("form cannot be null")
+            hidden_inputs = form.find_all('input', {'type': 'hidden'})
+
+            payload = {input['name']: input['value'] for input in hidden_inputs}
+            student_ids = []
+            marks = []
+            for it in grade_payload:
+                student_ids.append(it[0])
+                marks.append(it[1])
+            payload['x_StdModuleID[]'] = student_ids
+            payload['x_CW1[]'] = marks
+            payload['cw'] = course_work
+
+            print(payload)
+            # self.session.post(urls.course_work_update(course_work), payload)
+            console.print("Done 😃", style="green")
+
+
     def get_modules(self) -> list[Module]:
         with console.status(f"Loading Modules..."):
             res = self.session.get(urls.modules())
