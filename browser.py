@@ -55,8 +55,8 @@ class Browser:
             payload['cw'] = course_work.id.lower()
 
             res = self.session.post(urls.course_work_upload(), payload)
-            print(payload)
-            subprocess.run("clip", text=True, input=res.text)
+            # print(payload)
+            # subprocess.run("clip", text=True, input=res.text)
             console.print("Done 😃", style="green")
 
     def get_modules(self) -> list[Module]:

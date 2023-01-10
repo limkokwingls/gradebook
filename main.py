@@ -6,6 +6,7 @@ from rich.prompt import Confirm
 from rich.console import Console
 from rich.prompt import Prompt
 from pathlib import Path
+from console_utils import print_in_table
 from excel_reader import get_grades, get_worksheet, open_file
 from model import CourseWork
 
@@ -51,19 +52,25 @@ def main():
     sheet = get_worksheet(workbook)
     grades = get_grades(sheet)
 
-    payload = []
-    for id in student_ids:
-        marks = get_marks_for(grades, id)
-        payload.append(
-            (id[1], marks)
-        )
+    proceed = False
+    while not proceed:
+        payload = []
+        for id in student_ids:
+            marks = get_marks_for(grades, id)
+            payload.append(
+                (id[1], marks)
+            )
 
-    # # pprint(payload)
-    course_work, _ = pick(course_works, "Pick Assessment",
-                          indicator='->', )  # type: ignore
+        course_work, _ = pick(course_works, "Pick Assessment",
+                              indicator='->', )  # type: ignore
+        print()
 
-    print(course_work, "id", course_work.id)  # type: ignore
-    # # proceed = Confirm.ask("Ready to rumble, proceed?", default=True)
+        print_in_table({
+            "Confirm": ['Module', 'Course Work', 'Number of Students'],
+            "": [str(module), str(course_work), str(len(student_ids))],
+        })
+
+        proceed = Confirm.ask("Ready to rumble, proceed?", default=True)
 
     browser.upload_grades(course_work, payload)  # type: ignore
 
