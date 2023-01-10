@@ -1,7 +1,20 @@
+import imp
+from pathlib import Path
 from pprint import pprint
 from types import NoneType
+from openpyxl import Workbook
 import openpyxl
 from openpyxl.worksheet.worksheet import Worksheet
+from rich.prompt import Prompt
+from rich.console import Console
+from rich.prompt import Confirm
+from pick import pick
+
+from console_utils import print_in_table
+
+
+
+error_console = Console(stderr=True, style="bold red")
 
 
 def is_number(s):
@@ -13,24 +26,54 @@ def is_number(s):
         return False
     return True
 
+def open_file() -> Workbook: 
+    workbook: Workbook | None = None
+    while workbook == None:
+        try:
+            file_path = Prompt.ask("Workbook file path", default="C:/Users/Ntholi Nkhatho/Desktop/test.xlsx")
+            if Path(file_path).is_file():
+                workbook = openpyxl.load_workbook(file_path)
+        except Exception as e:
+            error_console.print("Error:", e)
+    return workbook
 
-def get_grades():
-    wb = openpyxl.load_workbook("C:/Users/Temp/Desktop/test.xlsx")
+def get_worksheet(workbook: Workbook) -> Worksheet:
+    sheet_names = workbook.sheetnames
+    if len(sheet_names) > 1:
+        sheet_name, _ = pick(workbook.sheetnames, "Select a sheet", indicator='->') #type: ignore    
+    else:
+        sheet_name = workbook.sheetnames[0]
+    return workbook[sheet_name]
 
-    sheet: Worksheet = wb['INTY1S1']  # type: ignore
 
-    student_col = 'C'
-    marks_col = 'D'
+def get_grades(sheet: Worksheet):
 
-    student_numbers = list([it.value for it in sheet[student_col]])
-    marks = list([it.value for it in sheet[marks_col]])
-
-    grades_book = list(zip(student_numbers, marks))
-
+    retry = True
     result = []
 
-    for grade in grades_book:
-        if is_number(grade[0]) and is_number(grade[1]):
-            result.append([int(float(grade[0])), int(grade[1])])
+    while retry:
+        print("Enter Column names for:")
+        
+        student_col = Prompt.ask("Student No", default='C')
+        marks_col = Prompt.ask("Marks", default='D')
+
+        student_numbers = list([it.value for it in sheet[student_col]])
+        marks = list([it.value for it in sheet[marks_col]])
+
+        grades_book = list(zip(student_numbers, marks))
+
+
+        for grade in grades_book:
+            if is_number(grade[0]) and is_number(grade[1]):
+                result.append([int(float(grade[0])), int(grade[1])])
+
+        print_in_table({
+            "Student No": [str(result[0][0])],
+            "Marks": [str(result[0][1])],
+            },
+            "First Record"
+        )
+        retry = not Confirm.ask(
+            f"Proceed?", default=True)
 
     return result

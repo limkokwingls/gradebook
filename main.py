@@ -5,6 +5,7 @@ from rich.prompt import Confirm
 from rich.console import Console
 from rich.prompt import Prompt
 from pathlib import Path
+from excel_reader import get_grades, get_worksheet, open_file
 
 console = Console()
 error_console = Console(stderr=True, style="bold red")
@@ -25,13 +26,19 @@ def login():
 
 
 def main():
-    while not browser.logged_in:
-        try_function(login)
+    # while not browser.logged_in:
+    #     try_function(login)
 
-    module_list = browser.get_modules()
-    module, _ = pick(module_list, "Pick Module", indicator='->')
+    # module_list = browser.get_modules()
+    # module, _ = pick(module_list, "Pick Module", indicator='->')
 
-    print(module)
+    # print(module)
+
+    workbook = open_file()
+    sheet = get_worksheet(workbook)
+    grades = get_grades(sheet)
+    print(grades)
+
 
 
 def try_function(func, *args):
