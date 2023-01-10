@@ -52,7 +52,7 @@ class Browser:
             payload['x_CW1[]'] = marks
             payload['cw'] = course_work
 
-            # res = self.session.post(urls.course_work_upload(), payload)
+            res = self.session.post(urls.course_work_upload(), payload)
             # print(payload)
             # subprocess.run("clip", text=True, input=res.text)
             console.print("Done 😃", style="green")
@@ -89,10 +89,10 @@ class Browser:
             table_data = read_table(table)
             data = []
             for it in table_data:
-                link = find_link_in_table(table, it[0], "Chg")
+                link = find_link_in_table(table, it[4], "Chg")
                 if not link:
                     raise Exception("link cannot be null")
-                id = link[link.find("ModuleID"):]
+                id = link[link.find("StdModuleID"):]
                 if id:
                     id = id[id.find("=")+1:]
                 data.append(

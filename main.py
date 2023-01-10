@@ -1,3 +1,4 @@
+from pprint import pprint
 from rich.prompt import Prompt
 from pick import pick
 from browser import Browser
@@ -53,6 +54,7 @@ def main():
             (id[1], marks)
         )
     
+    # pprint(payload)
     course_work = Prompt.ask("Course Work No", default='1')
 
     # proceed = Confirm.ask("Ready to rumble, proceed?", default=True)
