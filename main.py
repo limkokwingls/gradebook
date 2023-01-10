@@ -1,3 +1,5 @@
+from pprint import pprint
+import turtle
 from rich.prompt import Prompt
 from pick import pick
 from browser import Browser
@@ -25,6 +27,14 @@ def login():
     browser.login(username, password)
 
 
+def get_marks_for(grades: list[dict[str, str]], student_number: list[tuple[str]]):
+    marks = ''
+    for grade in grades:
+        key, value = next(iter(grade.items()))
+        if key == student_number[0]:
+            marks = str(value)
+    return marks
+
 def main():
     while not browser.logged_in:
         try_function(login)
@@ -34,12 +44,21 @@ def main():
 
     student_ids = browser.get_std_module_ids(module)
 
-    print(student_ids)
+    workbook = open_file()
+    sheet = get_worksheet(workbook)
+    grades = get_grades(sheet)
 
-    # workbook = open_file()
-    # sheet = get_worksheet(workbook)
-    # grades = get_grades(sheet)
-    # print(grades)
+    # proceed = Confirm.ask("Ready to rumble, proceed?", default=True)
+    
+    payload = []
+    for id in student_ids:
+        marks =  get_marks_for(grades, id)
+        payload.append(
+            (id[1], marks)
+        )
+
+    pprint(payload)
+
 
 
 

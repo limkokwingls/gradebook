@@ -46,7 +46,7 @@ def get_worksheet(workbook: Workbook) -> Worksheet:
     return workbook[sheet_name]
 
 
-def get_grades(sheet: Worksheet):
+def get_grades(sheet: Worksheet) -> list[dict[str, str]]:
 
     retry = True
     result = []
@@ -65,11 +65,12 @@ def get_grades(sheet: Worksheet):
 
         for grade in grades_book:
             if is_number(grade[0]) and is_number(grade[1]):
-                result.append((int(float(grade[0])), int(grade[1])))
+                result.append({str(int(float(grade[0]))): int(float(grade[1]))})
 
+        sample_std, sample_marks = next(iter(result[0].items()))
         print_in_table({
-            "Student No": [str(result[0][0])],
-            "Marks": [str(result[0][1])],
+            "Student No": [str(sample_std)],
+            "Marks": [str(sample_marks)],
             },
             "First Record"
         )

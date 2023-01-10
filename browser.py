@@ -52,7 +52,7 @@ class Browser:
 
 
     def get_std_module_ids(self, module):
-        with console.status(f"Loading Modules..."):
+        with console.status(f"Loading Students..."):
             res = self.session.get(urls.student_numbers(module))
             soup = BeautifulSoup(res.text, PARSER)
             table = soup.select_one("#ewlistmain")
@@ -67,7 +67,7 @@ class Browser:
                 id = link[link.find("ModuleID"):]
                 if id:
                     id = id[id.find("=")+1:]
-                data.append({
-                    it[4]: id
-                })
+                data.append(
+                    (it[4], id)
+                )
         return data
