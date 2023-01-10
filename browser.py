@@ -43,7 +43,8 @@ class Browser:
                 raise Exception("form cannot be null")
             hidden_inputs = form.find_all('input', {'type': 'hidden'})
 
-            payload = {input['name']: input['value'] for input in hidden_inputs}
+            payload = {input['name']: input['value']
+                       for input in hidden_inputs}
             student_ids = []
             marks = []
             for it in grade_payload:
@@ -51,13 +52,12 @@ class Browser:
                 marks.append(it[1])
             payload['x_StdModuleID[]'] = student_ids
             payload[f'x_{course_work.id}[]'] = marks
-            payload['cw'] = course_work
+            payload['cw'] = course_work.id.lower()
 
             res = self.session.post(urls.course_work_upload(), payload)
-            # print(payload)
-            # subprocess.run("clip", text=True, input=res.text)
+            print(payload)
+            subprocess.run("clip", text=True, input=res.text)
             console.print("Done 😃", style="green")
-
 
     def get_modules(self) -> list[Module]:
         with console.status(f"Loading Modules..."):
@@ -78,7 +78,6 @@ class Browser:
                 module = Module(id=id, code=it[0], name=it[1])
                 data.append(module)
             return data
-
 
     def get_std_module_ids_and_course_works(self, module):
         with console.status(f"Loading Students..."):
@@ -102,6 +101,7 @@ class Browser:
                 )
         return [data, course_works]
 
+
 def get_course_works(table: Tag):
     raw = read_table_header(table)[0]
     items = []
@@ -111,12 +111,14 @@ def get_course_works(table: Tag):
             if "Total" in it:
                 break
             if i == 7 or i % 2 != 0:
+                cw_id = find_course_work_id(table, it)
                 cw = CourseWork(
-                    id=f'CW{cw_id}',
+                    id=cw_id,
                     name=it
                 )
                 items.append(cw)
     return items
+
 
 def read_table_header(table: Tag):
     data = []
@@ -126,3 +128,25 @@ def read_table_header(table: Tag):
     # remove empty strings
     data.append([it for it in cols if it])
     return data
+
+
+def find_course_work_id(table: Tag, course_work: str) -> str:
+    id = ""
+    data = []
+    rows = table.select('tr')
+    subprocess.run("clip", text=True, input=str(rows))
+    for row in rows:
+        cols = row.select('td')
+        data.append([it for it in cols if it])
+        str_col = ''.join(str(it) for it in cols)
+        if course_work in str_col:
+            for i in range(len(cols)):
+                col = cols[i]
+                text = col.get_text(strip=True)
+                anchor = col.findChild("a")
+                if isinstance(anchor, Tag):
+                    if (text == course_work):
+                        link = anchor.attrs["href"]
+                        id = link[link.find("order"):]
+                        id = id[id.find("=")+1:]
+    return id

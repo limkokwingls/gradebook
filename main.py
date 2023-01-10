@@ -7,6 +7,7 @@ from rich.console import Console
 from rich.prompt import Prompt
 from pathlib import Path
 from excel_reader import get_grades, get_worksheet, open_file
+from model import CourseWork
 
 console = Console()
 error_console = Console(stderr=True, style="bold red")
@@ -34,35 +35,37 @@ def get_marks_for(grades: list[dict[str, str]], student_number: list[tuple[str]]
             marks = str(value)
     return marks
 
+
 def main():
     while not browser.logged_in:
         try_function(login)
 
     module_list = browser.get_modules()
-    module, _ = pick(module_list, "Pick Module", indicator='->') #type: ignore
+    module, _ = pick(module_list, "Pick Module",  # type: ignore
+                     indicator='->')
 
-    student_ids, course_works = browser.get_std_module_ids_and_course_works(module)
+    student_ids, course_works = browser.get_std_module_ids_and_course_works(
+        module)
 
     workbook = open_file()
     sheet = get_worksheet(workbook)
     grades = get_grades(sheet)
-    
+
     payload = []
     for id in student_ids:
-        marks =  get_marks_for(grades, id)
+        marks = get_marks_for(grades, id)
         payload.append(
             (id[1], marks)
         )
-    
-    # pprint(payload)
-    # course_work = Prompt.ask("Course Work No", default='1')
-    course_work, _ = pick(course_works, "Pick Module", indicator='->') #type: ignore
 
-    print(course_work, "id", course_work.id)
-    # proceed = Confirm.ask("Ready to rumble, proceed?", default=True)
+    # # pprint(payload)
+    course_work, _ = pick(course_works, "Pick Assessment",
+                          indicator='->', )  # type: ignore
 
-    # browser.upload_grades(course_work, payload)
+    print(course_work, "id", course_work.id)  # type: ignore
+    # # proceed = Confirm.ask("Ready to rumble, proceed?", default=True)
 
+    browser.upload_grades(course_work, payload)  # type: ignore
 
 
 def try_function(func, *args):
