@@ -1,11 +1,13 @@
 from pprint import pprint
 from bs4 import BeautifulSoup
 import requests
-from model import Module
+from model import CourseWork, Module
 import urls
 from rich.console import Console
+from bs4 import Tag
 from html_utils import find_link_in_table, read_table
 import subprocess
+
 
 console = Console()
 
@@ -32,10 +34,9 @@ class Browser:
             console.print("Login Successful", style="green")
             self.logged_in = True
 
-    def upload_grades(self, course_work_number: int, grade_payload: list):
-        course_work = f"cw{course_work_number}"
+    def upload_grades(self, course_work: CourseWork, grade_payload: list):
         with console.status("Uploading marks..."):
-            res = self.session.get(urls.course_work_page(course_work))
+            res = self.session.get(urls.course_work_page(course_work.id))
             page = BeautifulSoup(res.text, PARSER)
             form = page.select_one("#ff_breakdownmarksviewlist")
             if not form:
@@ -49,7 +50,7 @@ class Browser:
                 student_ids.append(it[0])
                 marks.append(it[1])
             payload['x_StdModuleID[]'] = student_ids
-            payload['x_CW1[]'] = marks
+            payload[f'x_{course_work.id}[]'] = marks
             payload['cw'] = course_work
 
             res = self.session.post(urls.course_work_upload(), payload)
@@ -79,7 +80,7 @@ class Browser:
             return data
 
 
-    def get_std_module_ids(self, module):
+    def get_std_module_ids_and_course_works(self, module):
         with console.status(f"Loading Students..."):
             res = self.session.get(urls.student_numbers(module))
             soup = BeautifulSoup(res.text, PARSER)
@@ -87,6 +88,7 @@ class Browser:
             if not table:
                 raise Exception("table cannot be null")
             table_data = read_table(table)
+            course_works = get_course_works(table)
             data = []
             for it in table_data:
                 link = find_link_in_table(table, it[4], "Chg")
@@ -98,4 +100,29 @@ class Browser:
                 data.append(
                     (it[4], id)
                 )
-        return data
+        return [data, course_works]
+
+def get_course_works(table: Tag):
+    raw = read_table_header(table)[0]
+    items = []
+    cw_id = 1
+    for i, it in enumerate(raw):
+        if i >= 7:
+            if "Total" in it:
+                break
+            if i == 7 or i % 2 != 0:
+                cw = CourseWork(
+                    id=f'CW{cw_id}',
+                    name=it
+                )
+                items.append(cw)
+    return items
+
+def read_table_header(table: Tag):
+    data = []
+    row = table.select('.ewTableHeader')[0]
+    cols = row.find_all('td')
+    cols = [it.get_text(strip=True) for it in cols]
+    # remove empty strings
+    data.append([it for it in cols if it])
+    return data

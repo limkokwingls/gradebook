@@ -12,6 +12,7 @@ def read_table(table: Tag):
     return data
 
 
+
 def find_link_in_table(table: Tag, search_key: str, target_link_text: str):
     data = []
     rows = table.select('tr:not(:first-child)')

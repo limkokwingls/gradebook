@@ -41,7 +41,7 @@ def main():
     module_list = browser.get_modules()
     module, _ = pick(module_list, "Pick Module", indicator='->') #type: ignore
 
-    student_ids = browser.get_std_module_ids(module)
+    student_ids, course_works = browser.get_std_module_ids_and_course_works(module)
 
     workbook = open_file()
     sheet = get_worksheet(workbook)
@@ -55,11 +55,13 @@ def main():
         )
     
     # pprint(payload)
-    course_work = Prompt.ask("Course Work No", default='1')
+    # course_work = Prompt.ask("Course Work No", default='1')
+    course_work, _ = pick(course_works, "Pick Module", indicator='->') #type: ignore
 
+    print(course_work, "id", course_work.id)
     # proceed = Confirm.ask("Ready to rumble, proceed?", default=True)
 
-    browser.upload_grades(int(course_work), payload)
+    # browser.upload_grades(course_work, payload)
 
 
 
