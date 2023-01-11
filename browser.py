@@ -30,8 +30,18 @@ class Browser:
                 "password": password,
                 token.attrs['name']: token.attrs["value"]
             }
-            self.session.post(urls.login, payload)
-            self.logged_in = True
+            res = self.session.post(urls.login, payload)
+            page = BeautifulSoup(res.text, PARSER)
+            tags = page.select(".phpmaker")
+
+            if len(tags) > 2:
+                display_name = tags[-2]
+                display_name = display_name.get_text(strip=True)
+                if "Welcome" in display_name:
+                    self.logged_in = True
+                    return display_name
+
+            
 
     def upload_grades(self, course_work: CourseWork, grade_payload: list):
         with console.status("Uploading marks..."):

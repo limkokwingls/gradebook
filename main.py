@@ -17,16 +17,33 @@ error_console = Console(stderr=True, style="bold red")
 browser = Browser()
 
 
+def input_username_and_password():
+    username = Prompt.ask("Username")
+    password = Prompt.ask("Password", password=True)
+    display_name = browser.login(username, password)
+    if not display_name:
+        error_console.print("Invalid Credentials")
+    else:
+        write_credentials(username, password)
+        print()
+    return display_name
+
 def login():
+    username, password, display_name = None, None, None
     credentials = read_credentials()
     if credentials:
         username, password = credentials
+        display_name = browser.login(username, password)
     else:
-        username = Prompt.ask("Username")
-        password = Prompt.ask("Password", password=True)
-        write_credentials(username, password)
+        print("Enter CMS credentials")
+        display_name = input_username_and_password()
 
-    browser.login(username, password)
+    while not display_name:
+        display_name = input_username_and_password()
+
+    if not Confirm.ask(f"{display_name} - Continue?", default=True):
+        exit()
+
 
 
 def get_marks_for(grades: list[dict[str, str]], student_number: list[tuple[str]]):
