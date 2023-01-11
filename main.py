@@ -101,6 +101,7 @@ def clear_screen():
     os.system('cls' if os.name=='nt' else 'clear')
 
 if __name__ == '__main__':
+    print("The Thing That Enters Marks into the CMS (v0.0.1)\n")
     while not browser.logged_in:
         try_function(login)
 

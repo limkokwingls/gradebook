@@ -59,7 +59,7 @@ def get_grades(sheet: Worksheet, course_work) -> list[dict[str, str]]:
     while True:
         student_col = Prompt.ask("Student No Column", default='C')
         marks_col = Prompt.ask(f"{course_work} Marks Column")
-        if student_col.isalpha() or not marks_col.isalpha():
+        if (not student_col) or (not marks_col) or student_col.isalpha() or marks_col.isalpha():
             break
         error_console.print("Column should be an alphabet")
 
@@ -79,8 +79,7 @@ def get_grades(sheet: Worksheet, course_work) -> list[dict[str, str]]:
     print_in_table({
         "Student No": keys,
         "Marks": values,
-    },
-        str(course_work)
+    },""
     )
 
     return result
