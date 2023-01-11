@@ -10,6 +10,7 @@ import subprocess
 
 
 console = Console()
+error_console = Console(stderr=True, style="red")
 
 PARSER = "html5lib"
 
@@ -110,7 +111,7 @@ class Browser:
                         (it[4], id)
                     )
                 except:
-                    pass
+                    error_console.print(f"\nMarks will not be uploaded for {it[3]} ({it[4]})")
         return [data, course_works]
 
 
