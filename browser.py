@@ -133,7 +133,7 @@ def find_course_work_id(table: Tag, course_work: str) -> str:
     id = ""
     data = []
     rows = table.select('tr')
-    subprocess.run("clip", text=True, input=str(rows))
+    # subprocess.run("clip", text=True, input=str(rows))
     for row in rows:
         cols = row.select('td')
         data.append([it for it in cols if it])

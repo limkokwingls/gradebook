@@ -37,20 +37,10 @@ def get_marks_for(grades: list[dict[str, str]], student_number: list[tuple[str]]
             marks = str(value)
     return marks
 
-
-def main():
-
-    module_list = browser.get_modules()
-    module, _ = pick(module_list, "Pick a Module",  # type: ignore
-                     indicator='->')
-    console.print(module, style="green")
-
-    student_ids, course_works = browser.get_std_module_ids_and_course_works(
-        module)
-
-    workbook = open_file()
-    sheet = get_worksheet(workbook)
+def repetitive_tasks(sheet, student_ids, course_works, module):
     grades = get_grades(sheet)
+    payload = []
+    course_work = None
 
     proceed = False
     while not proceed:
@@ -71,8 +61,32 @@ def main():
 
         proceed = Confirm.ask(
             "I'm ready to rumble, should I proceed?", default=True)
+    return [course_work, payload]
 
-    browser.upload_grades(course_work, payload)  # type: ignore
+def main():
+
+    module_list = browser.get_modules()
+    module, _ = pick(module_list, "Pick a Module",  # type: ignore
+                     indicator='->')
+    console.print(module, style="green")
+
+    student_ids, course_works = browser.get_std_module_ids_and_course_works(
+        module)
+
+    workbook = open_file()
+    sheet = get_worksheet(workbook)
+
+    while True:
+        course_work, payload = repetitive_tasks(sheet, student_ids, course_works, module)
+        browser.upload_grades(course_work, payload)  # type: ignore
+        add_another = Confirm.ask("\nDo you want to add another assessment?", default=True)
+        if add_another:
+            clear_screen()
+            console.print(module, style="green")
+            print()
+            continue
+        else:
+            break
 
 
 def try_function(func, *args):
@@ -88,6 +102,9 @@ def try_function(func, *args):
     return results
 
 
+def clear_screen():
+    os.system('cls' if os.name=='nt' else 'clear')
+
 if __name__ == '__main__':
     while not browser.logged_in:
         try_function(login)
@@ -95,4 +112,4 @@ if __name__ == '__main__':
     while True:
         main()
         input("Press any key to continue...")
-        os.system('cls' if os.name=='nt' else 'clear')
+        clear_screen()
