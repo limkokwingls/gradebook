@@ -38,21 +38,22 @@ def get_marks_for(grades: list[dict[str, str]], student_number: list[tuple[str]]
     return marks
 
 def repetitive_tasks(sheet, student_ids, course_works, module):
-    course_work, _ = pick(course_works, "Pick an Assessment",
-                              indicator='->', )  # type: ignore
-    print("Course Work:", course_work)
-    grades = get_grades(sheet, course_work)
     payload = []
+    course_work = []
 
     proceed = False
     while not proceed:
         payload = []
+        course_work, _ = pick(course_works, "Pick an Assessment",
+                                indicator='->', )  # type: ignore
+        print("Course Work:", course_work)
+        grades = get_grades(sheet, course_work)
         for id in student_ids:
             marks = get_marks_for(grades, id)
             payload.append(
                 (id[1], marks)
             )
-            
+
         proceed = Confirm.ask(
             "I'm ready to rumble, should I proceed?", default=True)
     return [course_work, payload]
@@ -73,7 +74,7 @@ def main():
     while True:
         course_work, payload = repetitive_tasks(sheet, student_ids, course_works, module)
         browser.upload_grades(course_work, payload)  # type: ignore
-        add_another = Confirm.ask("\nDo you want to add another assessment?", default=True)
+        add_another = Confirm.ask(f"\nDo you want to add another assessment for {module}?", default=True)
         if add_another:
             clear_screen()
             console.print(module, style="green")

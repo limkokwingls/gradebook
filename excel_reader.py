@@ -52,36 +52,35 @@ def get_worksheet(workbook: Workbook) -> Worksheet:
 
 def get_grades(sheet: Worksheet, course_work) -> list[dict[str, str]]:
 
-    retry = True
     result = []
+    student_col = None
+    marks_col = None
 
-    while retry:
-        result = []
+    while True:
         student_col = Prompt.ask("Student No Column", default='C')
         marks_col = Prompt.ask(f"{course_work} Marks Column")
+        if student_col.isalpha() or not marks_col.isalpha():
+            break
+        error_console.print("Column should be an alphabet")
 
-        if not student_col.isalpha() or not marks_col.isalpha():
-            error_console.print("Column should be an alphabet")
-            continue
+    student_numbers = list([it.value for it in sheet[student_col]])
+    marks = list([it.value for it in sheet[marks_col]])
 
-        student_numbers = list([it.value for it in sheet[student_col]])
-        marks = list([it.value for it in sheet[marks_col]])
+    grades_book = list(zip(student_numbers, marks))
 
-        grades_book = list(zip(student_numbers, marks))
+    for grade in grades_book:
+        if is_number(grade[0]) and is_number(grade[1]):
+            result.append(
+                {str(int(float(grade[0]))): int(float(grade[1]))})
 
-        for grade in grades_book:
-            if is_number(grade[0]) and is_number(grade[1]):
-                result.append(
-                    {str(int(float(grade[0]))): int(float(grade[1]))})
+    keys = [str(list(it.keys())[0]) for it in result]
+    values = [str(list(it.values())[0]) for it in result]
 
-        sample_std, sample_marks = next(iter(result[0].items()))
-        print_in_table({
-            "Student No": [str(sample_std)],
-            "Marks": [str(sample_marks)],
-        },
-            "First Record"
-        )
-        retry = not Confirm.ask(
-            f"Proceed?", default=True)
+    print_in_table({
+        "Student No": keys,
+        "Marks": values,
+    },
+        str(course_work)
+    )
 
     return result
