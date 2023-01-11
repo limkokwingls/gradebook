@@ -1,3 +1,4 @@
+import os
 from pprint import pprint
 from rich.prompt import Prompt
 from pick import pick
@@ -38,11 +39,9 @@ def get_marks_for(grades: list[dict[str, str]], student_number: list[tuple[str]]
 
 
 def main():
-    while not browser.logged_in:
-        try_function(login)
 
     module_list = browser.get_modules()
-    module, _ = pick(module_list, "Pick Module",  # type: ignore
+    module, _ = pick(module_list, "Pick a Module",  # type: ignore
                      indicator='->')
     console.print(module, style="green")
 
@@ -62,7 +61,7 @@ def main():
                 (id[1], marks)
             )
 
-        course_work, _ = pick(course_works, "Pick Assessment",
+        course_work, _ = pick(course_works, "Pick an Assessment",
                               indicator='->', )  # type: ignore
         print()
         print_in_table({
@@ -90,5 +89,10 @@ def try_function(func, *args):
 
 
 if __name__ == '__main__':
-    # with console.screen():
-    main()
+    while not browser.logged_in:
+        try_function(login)
+
+    while True:
+        main()
+        input("Press any key to continue...")
+        os.system('cls' if os.name=='nt' else 'clear')
