@@ -99,15 +99,18 @@ class Browser:
             course_works = get_course_works(table)
             data = []
             for it in table_data:
-                link = find_link_in_table(table, it[4], "Chg")
-                if not link:
-                    raise Exception("link cannot be null")
-                id = link[link.find("StdModuleID"):]
-                if id:
-                    id = id[id.find("=")+1:]
-                data.append(
-                    (it[4], id)
-                )
+                try:
+                    link = find_link_in_table(table, it[4], "Chg")
+                    if not link:
+                        raise Exception("link cannot be null")
+                    id = link[link.find("StdModuleID"):]
+                    if id:
+                        id = id[id.find("=")+1:]
+                    data.append(
+                        (it[4], id)
+                    )
+                except:
+                    pass
         return [data, course_works]
 
 
