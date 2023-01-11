@@ -23,8 +23,8 @@ def student_numbers(module: Module):
 
 
 def course_work_page(course_work: str):
-    return f"{_url}/f_breakdownmarksviewlist_new.php?a=edit&f=A&w={course_work.lower()}"
+    return f"{_url}/f_breakdownmarksviewlist_new.php?a=edit&w={course_work.lower()}"
 
 
 def course_work_upload():
-    return f"{_url}/f_breakdownmarksviewlist_new.php?f=A"
+    return f"{_url}/f_breakdownmarksviewlist_new.php"
