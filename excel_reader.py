@@ -10,6 +10,7 @@ from rich.prompt import Confirm
 from pick import pick
 
 from console_utils import print_in_table
+from model import CourseWork
 
 
 error_console = Console(stderr=True, style="bold red")
@@ -43,12 +44,13 @@ def get_worksheet(workbook: Workbook) -> Worksheet:
     if len(sheet_names) > 1:
         sheet_name, _ = pick(workbook.sheetnames,
                              "Select a sheet", indicator='->')  # type: ignore
+        print("Sheet Name:", sheet_name)
     else:
         sheet_name = workbook.sheetnames[0]
     return workbook[sheet_name]
 
 
-def get_grades(sheet: Worksheet) -> list[dict[str, str]]:
+def get_grades(sheet: Worksheet, course_work) -> list[dict[str, str]]:
 
     retry = True
     result = []
@@ -56,7 +58,7 @@ def get_grades(sheet: Worksheet) -> list[dict[str, str]]:
     while retry:
         result = []
         student_col = Prompt.ask("Student No Column", default='C')
-        marks_col = Prompt.ask("Marks Column")
+        marks_col = Prompt.ask(f"{course_work} Marks Column")
 
         if not student_col.isalpha() or not marks_col.isalpha():
             error_console.print("Column should be an alphabet")

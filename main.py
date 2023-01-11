@@ -38,9 +38,11 @@ def get_marks_for(grades: list[dict[str, str]], student_number: list[tuple[str]]
     return marks
 
 def repetitive_tasks(sheet, student_ids, course_works, module):
-    grades = get_grades(sheet)
+    course_work, _ = pick(course_works, "Pick an Assessment",
+                              indicator='->', )  # type: ignore
+    print("Course Work:", course_work)
+    grades = get_grades(sheet, course_work)
     payload = []
-    course_work = None
 
     proceed = False
     while not proceed:
@@ -50,15 +52,7 @@ def repetitive_tasks(sheet, student_ids, course_works, module):
             payload.append(
                 (id[1], marks)
             )
-
-        course_work, _ = pick(course_works, "Pick an Assessment",
-                              indicator='->', )  # type: ignore
-        print()
-        print_in_table({
-            "Confirm": ['Module', 'Course Work', 'Number of Students'],
-            "": [str(module), str(course_work), str(len(student_ids))],
-        })
-
+            
         proceed = Confirm.ask(
             "I'm ready to rumble, should I proceed?", default=True)
     return [course_work, payload]
