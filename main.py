@@ -1,5 +1,6 @@
 import os
 from pprint import pprint
+from openpyxl import Workbook
 from rich.prompt import Prompt
 from pick import pick
 from browser import Browser
@@ -9,8 +10,11 @@ from rich.prompt import Prompt
 from pathlib import Path
 from console_utils import print_in_table
 from credentials import read_credentials, write_credentials
-from excel_reader import get_grades, get_worksheet, open_file
-from model import CourseWork
+from excel_reader import get_grades, open_file
+from model import CourseWork, Module
+from rich import print
+
+from pick_utils import EXIT_LABEL, multiple_pick
 
 console = Console()
 error_console = Console(stderr=True, style="bold red")
@@ -27,6 +31,7 @@ def input_username_and_password():
         write_credentials(username, password)
         print()
     return display_name
+
 
 def login():
     username, password, display_name = None, None, None
@@ -45,7 +50,6 @@ def login():
         exit()
 
 
-
 def get_marks_for(grades: list[dict[str, str]], student_number: list[tuple[str]]):
     marks = ''
     for grade in grades:
@@ -53,6 +57,7 @@ def get_marks_for(grades: list[dict[str, str]], student_number: list[tuple[str]]
         if key == student_number[0]:
             marks = str(value)
     return marks
+
 
 def repetitive_tasks(sheet, student_ids, course_works, module):
     payload = []
@@ -62,7 +67,7 @@ def repetitive_tasks(sheet, student_ids, course_works, module):
     while not proceed:
         payload = []
         course_work, _ = pick(course_works, "Pick an Assessment",
-                                indicator='->', )  # type: ignore
+                              indicator='->', )  # type: ignore
         print("Course Work:", course_work)
         grades = get_grades(sheet, course_work)
         for id in student_ids:
@@ -75,30 +80,65 @@ def repetitive_tasks(sheet, student_ids, course_works, module):
             "I'm ready to rumble, should I proceed?", default=True)
     return [course_work, payload]
 
+
+def pick_module() -> Module | None:
+    list = browser.get_modules()
+    options = [str(it) for it in list]
+    options.append('<- Exit')
+    _, index = pick(options, "Pick a Module", indicator='->')
+    if index <= (len(list) - 1):  # type: ignore
+        return list[index]  # type: ignore
+    return None
+
+
+def pick_worksheet(workbook: Workbook):
+    list = workbook.sheetnames
+    sheet_name = None
+    if len(list) > 1:
+        options = [str(it) for it in list]
+        options.append(EXIT_LABEL)
+        _, index = pick(
+            options, f"Pick a Sheet", indicator='->',
+        )
+        if index <= (len(list) - 1):  # type: ignore
+            sheet_name = list[index]  # type: ignore
+    else:
+        sheet_name = workbook.sheetnames[0]
+    return sheet_name
+
+
+def pick_course_works(course_works: list) -> list[CourseWork] | None:
+    options = [str(it) for it in course_works]
+    return multiple_pick(options)
+
+
 def main():
-
-    module_list = browser.get_modules()
-    module, _ = pick(module_list, "Pick a Module",  # type: ignore
-                     indicator='->')
-    console.print(module, style="green")
-
+    # workbook = open_file()
+    # sheet = pick_worksheet(workbook)
+    module = pick_module()
+    if module == None:
+        exit()
+    # console.print(module, style="green")
+    print(module)
     student_ids, course_works = browser.get_std_module_ids_and_course_works(
         module)
 
-    workbook = open_file()
-    sheet = get_worksheet(workbook)
+    selected_course_works = pick_course_works(course_works)
+    print(selected_course_works)
 
-    while True:
-        course_work, payload = repetitive_tasks(sheet, student_ids, course_works, module)
-        browser.upload_grades(course_work, payload)  # type: ignore
-        add_another = Confirm.ask(f"\nDo you want to add another assessment for {module}?", default=True)
-        if add_another:
-            clear_screen()
-            console.print(module, style="green")
-            print()
-            continue
-        else:
-            break
+    # while True:
+    #     course_work, payload = repetitive_tasks(
+    #         sheet, student_ids, course_works, module)
+    #     browser.upload_grades(course_work, payload)  # type: ignore
+    #     add_another = Confirm.ask(
+    #         f"\nDo you want to add another assessment for {module}?", default=True)
+    #     if add_another:
+    #         clear_screen()
+    #         console.print(module, style="green")
+    #         print()
+    #         continue
+    #     else:
+    #         break
 
 
 def try_function(func, *args):
@@ -115,10 +155,11 @@ def try_function(func, *args):
 
 
 def clear_screen():
-    os.system('cls' if os.name=='nt' else 'clear')
+    os.system('cls' if os.name == 'nt' else 'clear')
+
 
 if __name__ == '__main__':
-    print("The Thing That Enters Marks into the CMS (v0.0.1)\n")
+    print("The Thing That Enters Marks into the CMS (0.0.1)\n")
     while not browser.logged_in:
         try_function(login)
 

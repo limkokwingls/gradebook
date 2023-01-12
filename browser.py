@@ -42,8 +42,6 @@ class Browser:
                     self.logged_in = True
                     return display_name
 
-            
-
     def upload_grades(self, course_work: CourseWork, grade_payload: list):
         with console.status("Uploading marks..."):
             res = self.session.get(urls.course_work_page(course_work.id))
@@ -64,7 +62,7 @@ class Browser:
             payload[f'x_{course_work.id}[]'] = marks
             payload['cw'] = course_work.id.lower()
 
-            res = self.session.post(urls.course_work_upload(), payload)
+            # res = self.session.post(urls.course_work_upload(), payload)
             # print(payload)
             # subprocess.run("clip", text=True, input=res.text)
             console.print("Done 😃", style="green")
@@ -111,7 +109,8 @@ class Browser:
                         (it[4], id)
                     )
                 except:
-                    error_console.print(f"\nMarks will not be uploaded for {it[3]} ({it[4]})")
+                    error_console.print(
+                        f"\nMarks will not be uploaded for {it[3]} ({it[4]})")
         return [data, course_works]
 
 

@@ -39,15 +39,15 @@ def open_file() -> Workbook:
     return workbook
 
 
-def get_worksheet(workbook: Workbook) -> Worksheet:
-    sheet_names = workbook.sheetnames
-    if len(sheet_names) > 1:
-        sheet_name, _ = pick(workbook.sheetnames,
-                             "Select a sheet", indicator='->')  # type: ignore
-        print("Sheet Name:", sheet_name)
-    else:
-        sheet_name = workbook.sheetnames[0]
-    return workbook[sheet_name]
+# def get_worksheet_names(workbook: Workbook) -> Worksheet:
+#     sheet_names = workbook.sheetnames
+#     if len(sheet_names) > 1:
+#         sheet_name, _ = pick(workbook.sheetnames,
+#                              "Select a sheet", indicator='->')  # type: ignore
+#         print("Sheet Name:", sheet_name)
+#     else:
+#         sheet_name = workbook.sheetnames[0]
+#     return workbook[sheet_name]
 
 
 def get_grades(sheet: Worksheet, course_work) -> list[dict[str, str]]:
@@ -79,7 +79,7 @@ def get_grades(sheet: Worksheet, course_work) -> list[dict[str, str]]:
     print_in_table({
         "Student No": keys,
         "Marks": values,
-    },""
+    }, ""
     )
 
     return result
