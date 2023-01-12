@@ -47,6 +47,10 @@ def open_file() -> Workbook:
 #     return workbook[sheet_name]
 
 
+def read_student_numbers(sheet: Worksheet, col: str):
+    return list([it.value for it in sheet[col]])
+
+
 # TODO: Remember to delete this function
 def read_grades(sheet: Worksheet, course_work: CourseWork) -> list[dict[str, str]]:
     result = []
@@ -61,7 +65,6 @@ def read_grades(sheet: Worksheet, course_work: CourseWork) -> list[dict[str, str
             break
         error_console.print("Column should be an alphabet")
 
-    student_numbers = list([it.value for it in sheet[student_col]])
     marks = list([it.value for it in sheet[marks_col]])
 
     grades_book = list(zip(student_numbers, marks))

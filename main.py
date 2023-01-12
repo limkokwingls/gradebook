@@ -10,7 +10,7 @@ from rich.prompt import Prompt
 from pathlib import Path
 from console_utils import print_in_table
 from credentials import read_credentials, write_credentials
-from excel_reader import find_marks_column, find_student_column, open_file
+from excel_reader import find_marks_column, find_student_column, open_file, read_student_numbers
 from openpyxl.worksheet.worksheet import Worksheet
 from model import CourseWork, Module
 from rich import print
@@ -113,17 +113,29 @@ def pick_course_works(course_works: list) -> list[CourseWork] | None:
     return multiple_pick(course_works)
 
 
-def get_grades(list: list[CourseWork], sheet: Worksheet):
+def get_workbook_std_numbers(sheet: Worksheet):
+    col = find_student_column(sheet)
+    while True:
+        col = Prompt.ask(
+            "[{sheet.title}] Enter Student No Column", default=col)
+        if col and col.isalpha():
+            break
+        error_console.print("Should be an alphabet")
+    return read_student_numbers(sheet, col)
+
+
+def get_workbook_grades(list: list[CourseWork], sheet: Worksheet):
     letters = []
-    student_col = find_student_column(sheet)
-    print(f"Enter Column Letters {sheet.title}")
-    student_col = Prompt.ask("Student No Column", default=student_col)
     for i, cw in enumerate(list):
-        marks_col = Prompt.ask(
-            f"'{cw.get_fullname()}' Column Letter",
-            default=find_marks_column(sheet, cw.get_fullname()),
-        )
-        letters.append(marks_col)
+        while True:
+            col = Prompt.ask(
+                f"'{cw.get_fullname()}' Column Letter",
+                default=find_marks_column(sheet, cw.get_fullname()),
+            )
+            if col and col.isalpha():
+                break
+            error_console.print("Should be an alphabet")
+        letters.append(col)
 
     print(letters)
 
@@ -139,9 +151,11 @@ def main():
     student_ids, course_works = browser.get_std_module_ids_and_course_works(
         module)
 
-    selected_course_works = pick_course_works(course_works)
-    if selected_course_works:
-        get_grades(selected_course_works, sheet)
+    print(get_workbook_std_numbers(sheet))
+
+    # selected_course_works = pick_course_works(course_works)
+    # if selected_course_works:
+    #     get_grades(selected_course_works, sheet)
 
     # while True:
     #     course_work, payload = repetitive_tasks(
