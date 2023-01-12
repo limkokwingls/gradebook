@@ -8,19 +8,10 @@ from rich.console import Console
 
 from console_utils import print_in_table
 from model import CourseWork
+from utils import is_number
 
 
 error_console = Console(stderr=True, style="bold red")
-
-
-def is_number(s):
-    if not s or type(s) == NoneType:
-        return False
-    try:
-        float(s)
-    except ValueError:
-        return False
-    return True
 
 
 def open_file() -> Workbook:
@@ -36,23 +27,18 @@ def open_file() -> Workbook:
     return workbook
 
 
-# def get_worksheet_names(workbook: Workbook) -> Worksheet:
-#     sheet_names = workbook.sheetnames
-#     if len(sheet_names) > 1:
-#         sheet_name, _ = pick(workbook.sheetnames,
-#                              "Select a sheet", indicator='->')  # type: ignore
-#         print("Sheet Name:", sheet_name)
-#     else:
-#         sheet_name = workbook.sheetnames[0]
-#     return workbook[sheet_name]
-
-
-def read_student_numbers(sheet: Worksheet, col: str):
-    return list([it.value for it in sheet[col]])
-
+def read_numeric_column(sheet: Worksheet, col: str):
+    result = []
+    raw = list([it.value for it in sheet[col]])
+    for it in raw:
+        if is_number(it):
+            result.append(it)
+    return result
 
 # TODO: Remember to delete this function
-def read_grades(sheet: Worksheet, course_work: CourseWork) -> list[dict[str, str]]:
+
+
+def old_read_grades(sheet: Worksheet, course_work: CourseWork) -> list[dict[str, str]]:
     result = []
     student_col = find_student_column(sheet)
     marks_col = find_marks_column(sheet, course_work.get_fullname())
