@@ -164,7 +164,7 @@ def get_course_work_fullname(cw_id: str, course_works: list[CourseWork]):
 
 
 def confirm_gradebook(gradebook: dict[str, list[dict[str, int]]], course_works: list[CourseWork]):
-    r"""
+    """
     gradebook should look something like this:
 
     {
@@ -175,16 +175,15 @@ def confirm_gradebook(gradebook: dict[str, list[dict[str, int]]], course_works: 
         'course_work_2': [...]
     }
     """
-    print(gradebook)
-
-    table = Table(title="Star Wars Movies")
-
+    data = {}
     for i, key in enumerate(gradebook.keys()):
+        cw = get_course_work_fullname(key, course_works)
         if i == 0:
-            table.add_column("Student No.", style="cyan")
-        table.add_column(get_course_work_fullname(key, course_works))
+            data["Student No."] = [next(iter(it)) for it in gradebook[key]]
+        data[cw] = [str(next(iter(it.values()))) for it in gradebook[key]]
+    print_in_table(data, "Ready to upload to CMS")
 
-    console.print(table)
+    return Confirm.ask("Proceed?", default=True)
 
 
 def main():
