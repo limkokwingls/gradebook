@@ -118,7 +118,7 @@ def get_workbook_std_numbers(sheet: Worksheet):
     col = find_student_column(sheet)
     while True:
         col = Prompt.ask(
-            f"[{sheet.title}] Enter Student No Column", default=col)
+            f"[{sheet.title}] Student No Column [italic]Letter", default=col)
         if col and col.isalpha():
             break
         error_console.print("Should be an alphabet")
@@ -126,20 +126,34 @@ def get_workbook_std_numbers(sheet: Worksheet):
     return read_numeric_column(sheet, col)
 
 
-def get_workbook_marks(list: list[CourseWork], sheet: Worksheet):
-    letters = []
-    for i, cw in enumerate(list):
+def get_workbook_marks(course_works: list[CourseWork], sheet: Worksheet):
+    result = {}
+    for cw in course_works:
         while True:
             col = Prompt.ask(
-                f"'{cw.get_fullname()}' Column Letter",
-                default=find_marks_column(sheet, cw.get_fullname()),
+                f"'{cw.fullname()}' Column Letter",
+                default=find_marks_column(sheet, cw.fullname()),
             )
             if col and col.isalpha():
                 break
             error_console.print("Should be an alphabet")
-        letters.append(col)
+        result[cw.id] = read_numeric_column(sheet, col)
 
-    print(letters)
+    return result
+
+
+def create_uploadable_gradebook(student_numbers: list[int], marks: dict[str, list[int]]):
+    gradebook = {}
+    for key in marks.keys():
+        ids_and_marks = []
+        grades = list(zip(student_numbers, marks[key]))
+        for grade in grades:
+            if is_number(grade[0]) and is_number(grade[1]):
+                ids_and_marks.append(
+                    {str(int(float(grade[0]))): int(float(grade[1]))})
+        gradebook[key] = ids_and_marks
+
+    return gradebook
 
 
 def main():
@@ -149,11 +163,15 @@ def main():
     if module == None:
         exit()
     # console.print(module, style="green")
-    print(str(module))
+    print(f"[bold blue]{str(module)}")
     student_ids, course_works = browser.get_std_module_ids_and_course_works(
         module)
 
-    print(get_workbook_std_numbers(sheet))
+    student_numbers = get_workbook_std_numbers(sheet)
+    marks = get_workbook_marks(course_works, sheet)
+
+    gradebook = create_uploadable_gradebook(student_numbers, marks)
+    print(gradebook)
 
     # selected_course_works = pick_course_works(course_works)
     # if selected_course_works:

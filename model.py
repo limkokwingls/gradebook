@@ -17,9 +17,9 @@ class CourseWork:
     name: str
 
     def __str__(self):
-        return self.get_fullname()
+        return self.fullname()
 
-    def get_fullname(self):
+    def fullname(self):
         fullname = ''
         number = ''
 

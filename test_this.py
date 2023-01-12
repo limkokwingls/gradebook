@@ -8,4 +8,4 @@ cw = CourseWork(
 )
 
 
-print(cw.get_fullname())
+print(cw.fullname())

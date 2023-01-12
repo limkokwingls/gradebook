@@ -41,7 +41,7 @@ def read_numeric_column(sheet: Worksheet, col: str):
 def old_read_grades(sheet: Worksheet, course_work: CourseWork) -> list[dict[str, str]]:
     result = []
     student_col = find_student_column(sheet)
-    marks_col = find_marks_column(sheet, course_work.get_fullname())
+    marks_col = find_marks_column(sheet, course_work.fullname())
 
     while True:
         student_col = Prompt.ask("Student No Column", default=student_col)
