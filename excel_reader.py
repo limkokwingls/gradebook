@@ -47,7 +47,8 @@ def open_file() -> Workbook:
 #     return workbook[sheet_name]
 
 
-def get_grades(sheet: Worksheet, course_work: CourseWork) -> list[dict[str, str]]:
+# TODO: Remember to delete this function
+def read_grades(sheet: Worksheet, course_work: CourseWork) -> list[dict[str, str]]:
     result = []
     student_col = find_student_column(sheet)
     marks_col = find_marks_column(sheet, course_work.get_fullname())
