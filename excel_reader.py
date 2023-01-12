@@ -18,7 +18,8 @@ def open_file() -> Workbook:
     workbook: Workbook | None = None
     while workbook == None:
         try:
-            file_path = Prompt.ask("RAW Mark-sheet")
+            file_path = Prompt.ask(
+                "RAW Mark-sheet", default="C:\\Users\\Temp\\Desktop\\test.xlsx")
             file_path = file_path.strip('\"')
             if Path(file_path).is_file():
                 workbook = openpyxl.load_workbook(file_path)

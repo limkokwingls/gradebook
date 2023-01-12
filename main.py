@@ -1,5 +1,4 @@
 import os
-from pprint import pprint
 from openpyxl import Workbook
 from rich.prompt import Prompt
 from pick import pick
@@ -14,6 +13,7 @@ from excel_reader import find_marks_column, find_student_column, open_file, read
 from openpyxl.worksheet.worksheet import Worksheet
 from model import CourseWork, Module
 from rich import print
+from rich.table import Table
 
 from pick_utils import EXIT_LABEL, multiple_pick
 from utils import is_number
@@ -156,22 +156,53 @@ def create_uploadable_gradebook(student_numbers: list[int], marks: dict[str, lis
     return gradebook
 
 
+def get_course_work_fullname(cw_id: str, course_works: list[CourseWork]):
+    for cw in course_works:
+        if cw.id == cw_id:
+            return cw.fullname()
+    return cw_id
+
+
+def confirm_gradebook(gradebook: dict[str, list[dict[str, int]]], course_works: list[CourseWork]):
+    r"""
+    gradebook should look something like this:
+
+    {
+        'course_work_1': [
+            {'std_number', marks},
+            {'std_number', marks},
+        ],
+        'course_work_2': [...]
+    }
+    """
+    print(gradebook)
+
+    table = Table(title="Star Wars Movies")
+
+    for i, key in enumerate(gradebook.keys()):
+        if i == 0:
+            table.add_column("Student No.", style="cyan")
+        table.add_column(get_course_work_fullname(key, course_works))
+
+    console.print(table)
+
+
 def main():
-    # workbook = open_file()
-    # sheet = pick_worksheet(workbook)
+    workbook = open_file()
+    sheet = pick_worksheet(workbook)
     module = pick_module()
     if module == None:
         exit()
-    # console.print(module, style="green")
     print(f"[bold blue]{str(module)}")
     cms_std_id, course_works = browser.get_std_module_ids_and_course_works(
         module)
 
-    # student_numbers = get_workbook_std_numbers(sheet)
-    # marks = get_workbook_marks(course_works, sheet)
+    student_numbers = get_workbook_std_numbers(sheet)
+    marks = get_workbook_marks(course_works, sheet)
 
-    # gradebook = create_uploadable_gradebook(student_numbers, marks)
-    print(cms_std_id)
+    gradebook = create_uploadable_gradebook(student_numbers, marks)
+    is_confirmed = confirm_gradebook(gradebook, course_works)
+    # print(cms_std_id)
 
     # selected_course_works = pick_course_works(course_works)
     # if selected_course_works:
