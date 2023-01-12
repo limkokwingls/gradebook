@@ -1,13 +1,10 @@
 from pathlib import Path
-from pprint import pprint
 from types import NoneType
 from openpyxl import Workbook
 import openpyxl
 from openpyxl.worksheet.worksheet import Worksheet
 from rich.prompt import Prompt
 from rich.console import Console
-from rich.prompt import Confirm
-from pick import pick
 
 from console_utils import print_in_table
 from model import CourseWork
@@ -50,15 +47,15 @@ def open_file() -> Workbook:
 #     return workbook[sheet_name]
 
 
-def get_grades(sheet: Worksheet, course_work) -> list[dict[str, str]]:
-
+def get_grades(sheet: Worksheet, course_work: CourseWork) -> list[dict[str, str]]:
     result = []
-    student_col = None
-    marks_col = None
+    student_col = find_student_column(sheet)
+    marks_col = find_marks_column(sheet, course_work.get_fullname())
 
     while True:
-        student_col = Prompt.ask("Student No Column", default='C')
-        marks_col = Prompt.ask(f"{course_work} Marks Column")
+        student_col = Prompt.ask("Student No Column", default=student_col)
+        marks_col = Prompt.ask(
+            f"{course_work} Marks Column", default=marks_col)
         if (not student_col) or (not marks_col) or student_col.isalpha() or marks_col.isalpha():
             break
         error_console.print("Column should be an alphabet")
@@ -83,3 +80,17 @@ def get_grades(sheet: Worksheet, course_work) -> list[dict[str, str]]:
     )
 
     return result
+
+
+def find_marks_column(sheet: Worksheet, course_work: str):
+    for col in sheet.iter_cols():
+        for cell in col:
+            if type(cell.value) is str and cell.value.lower() == course_work.lower():
+                return cell.column_letter
+
+
+def find_student_column(sheet: Worksheet):
+    for col in sheet.iter_cols():
+        for cell in col:
+            if type(cell.value) is str and cell.value.lower().startswith('student no'):
+                return cell.column_letter
