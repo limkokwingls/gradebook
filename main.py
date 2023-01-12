@@ -157,21 +157,21 @@ def create_uploadable_gradebook(student_numbers: list[int], marks: dict[str, lis
 
 
 def main():
-    workbook = open_file()
-    sheet = pick_worksheet(workbook)
+    # workbook = open_file()
+    # sheet = pick_worksheet(workbook)
     module = pick_module()
     if module == None:
         exit()
     # console.print(module, style="green")
     print(f"[bold blue]{str(module)}")
-    student_ids, course_works = browser.get_std_module_ids_and_course_works(
+    cms_std_id, course_works = browser.get_std_module_ids_and_course_works(
         module)
 
-    student_numbers = get_workbook_std_numbers(sheet)
-    marks = get_workbook_marks(course_works, sheet)
+    # student_numbers = get_workbook_std_numbers(sheet)
+    # marks = get_workbook_marks(course_works, sheet)
 
-    gradebook = create_uploadable_gradebook(student_numbers, marks)
-    print(gradebook)
+    # gradebook = create_uploadable_gradebook(student_numbers, marks)
+    print(cms_std_id)
 
     # selected_course_works = pick_course_works(course_works)
     # if selected_course_works:

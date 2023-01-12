@@ -96,7 +96,7 @@ class Browser:
                 raise Exception("table cannot be null")
             table_data = read_table(table)
             course_works = get_course_works(table)
-            data = []
+            id_dict = {}
             for it in table_data:
                 try:
                     link = find_link_in_table(table, it[4], "Chg")
@@ -105,13 +105,11 @@ class Browser:
                     id = link[link.find("StdModuleID"):]
                     if id:
                         id = id[id.find("=")+1:]
-                    data.append(
-                        (it[4], id)
-                    )
+                    id_dict[it[4]] = id
                 except:
                     error_console.print(
                         f"\nMarks will not be uploaded for {it[3]} ({it[4]})")
-        return [data, course_works]
+        return [id_dict, course_works]
 
 
 def get_course_works(table: Tag):
