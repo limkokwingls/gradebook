@@ -1,7 +1,7 @@
 
 from pick import pick
 
-EXIT_LABEL = '<- Exit'
+EXIT_LABEL = '[[Back/Exit]]'
 
 
 def multiple_pick(options: list, title="Select at least one item"):

@@ -28,12 +28,15 @@ def open_file() -> Workbook:
     return workbook
 
 
-def read_numeric_column(sheet: Worksheet, col: str):
+def read_numeric_column(sheet: Worksheet, col: str) -> list[str]:
+    """
+    Note that this function will also convert the numeric values to string
+    """
     result = []
     raw = list([it.value for it in sheet[col]])
     for it in raw:
         if is_number(it):
-            result.append(it)
+            result.append(str(it))
     return result
 
 # TODO: Remember to delete this function

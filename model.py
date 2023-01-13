@@ -42,6 +42,8 @@ class CourseWork:
             fullname = "MidTerm"
         elif name.startswith("GAss"):
             fullname = "Group Assignment"
+        elif name.startswith("GPro"):
+            fullname = "Group Project"
         elif name.startswith("Excs"):
             fullname = "Exercises"
         elif name.startswith("FExm"):

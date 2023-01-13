@@ -1,11 +1,8 @@
 
-from model import CourseWork
+dic = {
+    "one": 1,
+    "two": 2,
+    "three": 3
+}
 
-
-cw = CourseWork(
-    id='2',
-    name='MTT (59)'
-)
-
-
-print(cw.fullname())
+print(dic.values())

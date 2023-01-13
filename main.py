@@ -86,7 +86,7 @@ def get_marks_for(grades: list[dict[str, str]], student_number: list[tuple[str]]
 def pick_module() -> Module | None:
     list = browser.get_modules()
     options = [str(it) for it in list]
-    options.append('<- Exit')
+    options.append(EXIT_LABEL)
     _, index = pick(options, "Pick a Module", indicator='->')
     if index <= (len(list) - 1):  # type: ignore
         return list[index]  # type: ignore
@@ -118,7 +118,7 @@ def get_workbook_std_numbers(sheet: Worksheet):
     col = find_student_column(sheet)
     while True:
         col = Prompt.ask(
-            f"[{sheet.title}] Student No Column [italic]Letter", default=col)
+            f"[{sheet.title}] Student No Column", default=col)
         if col and col.isalpha():
             break
         error_console.print("Should be an alphabet")
@@ -131,7 +131,7 @@ def get_workbook_marks(course_works: list[CourseWork], sheet: Worksheet):
     for cw in course_works:
         while True:
             col = Prompt.ask(
-                f"'{cw.fullname()}' Column Letter",
+                f"'{cw.fullname()}' Column",
                 default=find_marks_column(sheet, cw.fullname()),
             )
             if col and col.isalpha():
@@ -142,16 +142,26 @@ def get_workbook_marks(course_works: list[CourseWork], sheet: Worksheet):
     return result
 
 
-def create_uploadable_gradebook(student_numbers: list[int], marks: dict[str, list[int]]):
+def create_gradebook(student_numbers: list[str], marks: dict[str, list[str]]):
+    """
+    gradebook should look something like this:
+
+    {
+        'course_work_1': {
+            std_number: marks,
+            std_number: marks,
+        }
+        'course_work_2': {...}
+    }
+    """
     gradebook = {}
     for key in marks.keys():
-        ids_and_marks = []
-        grades = list(zip(student_numbers, marks[key]))
-        for grade in grades:
+        map = {}
+        std_and_marks = list(zip(student_numbers, marks[key]))
+        for grade in std_and_marks:
             if is_number(grade[0]) and is_number(grade[1]):
-                ids_and_marks.append(
-                    {str(int(float(grade[0]))): int(float(grade[1]))})
-        gradebook[key] = ids_and_marks
+                map[grade[0]] = grade[1]
+        gradebook[key] = map
 
     return gradebook
 
@@ -163,27 +173,39 @@ def get_course_work_fullname(cw_id: str, course_works: list[CourseWork]):
     return cw_id
 
 
-def confirm_gradebook(gradebook: dict[str, list[dict[str, int]]], course_works: list[CourseWork]):
-    """
-    gradebook should look something like this:
-
-    {
-        'course_work_1': [
-            {'std_number', marks},
-            {'std_number', marks},
-        ],
-        'course_work_2': [...]
-    }
-    """
+def confirm_gradebook(gradebook: dict[str, dict[str, str]],
+                      course_works: list[CourseWork]):
     data = {}
     for i, key in enumerate(gradebook.keys()):
         cw = get_course_work_fullname(key, course_works)
         if i == 0:
-            data["Student No."] = [next(iter(it)) for it in gradebook[key]]
-        data[cw] = [str(next(iter(it.values()))) for it in gradebook[key]]
+            data["Student No."] = [str(it) for it in gradebook[key]]
+        data[cw] = [str(it) for it in list(gradebook[key].values())]
+
     print_in_table(data, "Ready to upload to CMS")
 
     return Confirm.ask("Proceed?", default=True)
+
+
+def create_payloads(gradebook: dict[str, dict[str, str]],
+                    cms_std_numbers: dict[str, str]):
+    payload_list = {}
+
+    for key in gradebook:
+        course_work_res = gradebook[key]
+        marks = []
+        ids = []
+        for std in cms_std_numbers:
+            if std in course_work_res:
+                ids.append(cms_std_numbers[std])
+                marks.append(course_work_res[std])
+
+        payload_list[key] = {
+            "x_StdModuleID[]": ids,
+            f'x_{key}[]': marks
+        }
+
+    return payload_list
 
 
 def main():
@@ -199,8 +221,11 @@ def main():
     student_numbers = get_workbook_std_numbers(sheet)
     marks = get_workbook_marks(course_works, sheet)
 
-    gradebook = create_uploadable_gradebook(student_numbers, marks)
-    is_confirmed = confirm_gradebook(gradebook, course_works)
+    gradebook = create_gradebook(student_numbers, marks)
+    # print(gradebook)
+    # print(cms_std_id)
+    print(create_payloads(gradebook, cms_std_id))
+    # is_confirmed = confirm_gradebook(gradebook, course_works)
     # print(cms_std_id)
 
     # selected_course_works = pick_course_works(course_works)
@@ -240,7 +265,7 @@ def clear_screen():
 
 
 if __name__ == '__main__':
-    print("The Thing That Enters Marks into the CMS (0.0.1)\n")
+    print("The Thing That Enters Marks into the CMS (0.1.0_dev)\n")
     while not browser.logged_in:
         try_function(login)
 
