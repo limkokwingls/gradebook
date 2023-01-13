@@ -61,28 +61,6 @@ def get_marks_for(grades: list[dict[str, str]], student_number: list[tuple[str]]
     return marks
 
 
-# def repetitive_tasks(sheet, student_ids, course_works, module):
-#     payload = []
-#     course_work = []
-
-#     proceed = False
-#     while not proceed:
-#         payload = []
-#         course_work, _ = pick(course_works, "Pick an Assessment",
-#                               indicator='->', )  # type: ignore
-#         print("Course Work:", course_work)
-#         grades = get_grades(sheet, course_work)
-#         for id in student_ids:
-#             marks = get_marks_for(grades, id)
-#             payload.append(
-#                 (id[1], marks)
-#             )
-
-#         proceed = Confirm.ask(
-#             "I'm ready to rumble, should I proceed?", default=True)
-#     return [course_work, payload]
-
-
 def pick_module() -> Module | None:
     list = browser.get_modules()
     options = [str(it) for it in list]
@@ -148,8 +126,8 @@ def create_gradebook(student_numbers: list[str], marks: dict[str, list[str]]):
 
     {
         'course_work_1': {
-            std_number: marks,
-            std_number: marks,
+            'std_number': 'marks',
+            'std_number': 'marks',
         }
         'course_work_2': {...}
     }
@@ -187,30 +165,27 @@ def confirm_gradebook(gradebook: dict[str, dict[str, str]],
     return Confirm.ask("Proceed?", default=True)
 
 
-def create_payloads(gradebook: dict[str, dict[str, str]],
+def create_payloads(course_work: CourseWork,
+                    gradebook: dict[str, dict[str, str]],
                     cms_std_numbers: dict[str, str]):
-    payload_list = {}
 
-    for key in gradebook:
-        course_work_res = gradebook[key]
-        marks = []
-        ids = []
-        for std in cms_std_numbers:
-            if std in course_work_res:
-                ids.append(cms_std_numbers[std])
-                marks.append(course_work_res[std])
+    course_work_res = gradebook[course_work.id]
+    marks = []
+    ids = []
+    for std in cms_std_numbers:
+        if std in course_work_res:
+            ids.append(cms_std_numbers[std])
+            marks.append(course_work_res[std])
 
-        payload_list[key] = {
-            "x_StdModuleID[]": ids,
-            f'x_{key}[]': marks
-        }
-
-    return payload_list
+    return {
+        "x_StdModuleID[]": ids,
+        f'x_{course_work.id}[]': marks
+    }
 
 
 def main():
     workbook = open_file()
-    sheet = pick_worksheet(workbook)
+    sheet: Worksheet = pick_worksheet(workbook)  # type: ignore
     module = pick_module()
     if module == None:
         exit()
@@ -222,29 +197,13 @@ def main():
     marks = get_workbook_marks(course_works, sheet)
 
     gradebook = create_gradebook(student_numbers, marks)
-    # print(gradebook)
-    # print(cms_std_id)
-    print(create_payloads(gradebook, cms_std_id))
+
     # is_confirmed = confirm_gradebook(gradebook, course_works)
-    # print(cms_std_id)
 
-    # selected_course_works = pick_course_works(course_works)
-    # if selected_course_works:
-    #     get_grades(selected_course_works, sheet)
-
-    # while True:
-    #     course_work, payload = repetitive_tasks(
-    #         sheet, student_ids, course_works, module)
-    #     browser.upload_grades(course_work, payload)  # type: ignore
-    #     add_another = Confirm.ask(
-    #         f"\nDo you want to add another assessment for {module}?", default=True)
-    #     if add_another:
-    #         clear_screen()
-    #         console.print(module, style="green")
-    #         print()
-    #         continue
-    #     else:
-    #         break
+    for cw in course_works:
+        payload = create_payloads(cw, gradebook, cms_std_id)
+        browser.upload_grades(cw, payload)
+    console.print("Done 😃", style="green")
 
 
 def try_function(func, *args):

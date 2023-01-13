@@ -42,8 +42,8 @@ class Browser:
                     self.logged_in = True
                     return display_name
 
-    def upload_grades(self, course_work: CourseWork, grade_payload: list):
-        with console.status("Uploading marks..."):
+    def upload_grades(self, course_work: CourseWork, grade_payload: dict[str, list[str]]):
+        with console.status(f"Uploading marks for {course_work.fullname()}"):
             res = self.session.get(urls.course_work_page(course_work.id))
             page = BeautifulSoup(res.text, PARSER)
             form = page.select_one("#ff_breakdownmarksviewlist")
@@ -53,19 +53,15 @@ class Browser:
 
             payload = {input['name']: input['value']
                        for input in hidden_inputs}
-            student_ids = []
-            marks = []
-            for it in grade_payload:
-                student_ids.append(it[0])
-                marks.append(it[1])
-            payload['x_StdModuleID[]'] = student_ids
-            payload[f'x_{course_work.id}[]'] = marks
+
+            payload.update(grade_payload)
             payload['cw'] = course_work.id.lower()
+
+            print(payload)
 
             # res = self.session.post(urls.course_work_upload(), payload)
             # print(payload)
             # subprocess.run("clip", text=True, input=res.text)
-            console.print("Done 😃", style="green")
 
     def get_modules(self) -> list[Module]:
         with console.status(f"Loading Modules..."):

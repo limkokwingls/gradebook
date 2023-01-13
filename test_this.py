@@ -1,8 +1,15 @@
 
-dic = {
+one = {
     "one": 1,
     "two": 2,
     "three": 3
 }
 
-print(dic.values())
+two = {
+    "four": 4,
+    "five": 5
+}
+
+one.update(two)
+
+print(one)
