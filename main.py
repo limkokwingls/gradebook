@@ -74,16 +74,16 @@ def pick_module() -> Module | None:
 def pick_worksheet(workbook: Workbook) -> Worksheet | None:
     list = workbook.sheetnames
     sheet_name = None
-    if len(list) > 1:
-        options = [str(it) for it in list]
-        options.append(EXIT_LABEL)
-        _, index = pick(
-            options, f"Pick a Sheet", indicator='->',
-        )
-        if index <= (len(list) - 1):  # type: ignore
-            sheet_name = list[index]  # type: ignore
-    else:
-        sheet_name = workbook.sheetnames[0]
+    # if len(list) > 1:
+    options = [str(it) for it in list]
+    options.append(EXIT_LABEL)
+    _, index = pick(
+        options, f"Pick a Sheet", indicator='->',
+    )
+    if index <= (len(list) - 1):  # type: ignore
+        sheet_name = list[index]  # type: ignore
+    # else:
+    #     sheet_name = workbook.sheetnames[0]
     if sheet_name:
         return workbook[sheet_name]
 
@@ -184,26 +184,34 @@ def create_payloads(course_work: CourseWork,
 
 
 def main():
-    workbook = open_file()
-    sheet: Worksheet = pick_worksheet(workbook)  # type: ignore
-    module = pick_module()
-    if module == None:
-        exit()
-    print(f"[bold blue]{str(module)}")
-    cms_std_id, course_works = browser.get_std_module_ids_and_course_works(
-        module)
+    while True:
+        module = pick_module()
+        if module == None:
+            break
+        print(f"[bold blue]{str(module)}")
+        while True:
+            workbook = open_file()
+            sheet = pick_worksheet(workbook)
+            if not sheet:
+                continue
+            cms_std_id, course_works = browser.read_cms_gradebook(module)
+            while True:
+                student_numbers = get_workbook_std_numbers(sheet)
+                marks = get_workbook_marks(course_works, sheet)
+                gradebook = create_gradebook(student_numbers, marks)
 
-    student_numbers = get_workbook_std_numbers(sheet)
-    marks = get_workbook_marks(course_works, sheet)
+                confirmed = confirm_gradebook(gradebook, course_works)
+                if not confirmed:
+                    continue
 
-    gradebook = create_gradebook(student_numbers, marks)
-
-    # is_confirmed = confirm_gradebook(gradebook, course_works)
-
-    for cw in course_works:
-        payload = create_payloads(cw, gradebook, cms_std_id)
-        browser.upload_grades(cw, payload)
-    console.print("Done 😃", style="green")
+                size = len(course_works)
+                for i, cw in enumerate(course_works):
+                    payload = create_payloads(cw, gradebook, cms_std_id)
+                    browser.upload_grades(f"{i+1}/{size})", cw, payload)
+                console.print("Done 😃", style="green")
+                break
+            break
+        break
 
 
 def try_function(func, *args):
@@ -230,5 +238,5 @@ if __name__ == '__main__':
 
     while True:
         main()
-        input("Press any key to continue...")
+        input("\nPress any key to continue...")
         clear_screen()

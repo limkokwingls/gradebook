@@ -42,8 +42,8 @@ class Browser:
                     self.logged_in = True
                     return display_name
 
-    def upload_grades(self, course_work: CourseWork, grade_payload: dict[str, list[str]]):
-        with console.status(f"Uploading marks for {course_work.fullname()}"):
+    def upload_grades(self, progress: str, course_work: CourseWork, grade_payload: dict[str, list[str]]):
+        with console.status(f"{progress} Uploading marks for '{course_work.fullname()}'..."):
             res = self.session.get(urls.course_work_page(course_work.id))
             page = BeautifulSoup(res.text, PARSER)
             form = page.select_one("#ff_breakdownmarksviewlist")
@@ -57,7 +57,7 @@ class Browser:
             payload.update(grade_payload)
             payload['cw'] = course_work.id.lower()
 
-            print(payload)
+            # print(payload)
 
             # res = self.session.post(urls.course_work_upload(), payload)
             # print(payload)
@@ -83,7 +83,7 @@ class Browser:
                 data.append(module)
             return data
 
-    def get_std_module_ids_and_course_works(self, module):
+    def read_cms_gradebook(self, module):
         with console.status(f"Loading Students..."):
             res = self.session.get(urls.student_numbers(module))
             soup = BeautifulSoup(res.text, PARSER)
