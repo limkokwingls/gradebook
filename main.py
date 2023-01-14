@@ -96,7 +96,7 @@ def get_workbook_std_numbers(sheet: Worksheet):
     col = find_student_column(sheet)
     while True:
         col = Prompt.ask(
-            f"[{sheet.title}] Student No Column", default=col)
+            f"- Student Numbers", default=col)
         if col and col.isalpha():
             break
         error_console.print("Should be an alphabet")
@@ -109,7 +109,7 @@ def get_workbook_marks(course_works: list[CourseWork], sheet: Worksheet):
     for cw in course_works:
         while True:
             col = Prompt.ask(
-                f"'{cw.fullname()}' Column",
+                f"- {cw.fullname()}",
                 default=find_marks_column(sheet, cw.fullname()),
             )
             if col and col.isalpha():
@@ -196,6 +196,8 @@ def main():
                 continue
             cms_std_id, course_works = browser.read_cms_gradebook(module)
             while True:
+                print(
+                    f"\nReady to read from {sheet.title}, enter column letters for the following:")
                 student_numbers = get_workbook_std_numbers(sheet)
                 marks = get_workbook_marks(course_works, sheet)
                 gradebook = create_gradebook(student_numbers, marks)
