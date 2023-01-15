@@ -120,7 +120,9 @@ class Browser:
             table_data = read_table(table)
 
             BorderlineObject.percent_covered = read_percent_covered(table)
-            marks, marks_name, weight = read_final_assessment(table)
+            exam_id, marks_name, marks, weight = read_final_assessment(table)
+
+            BorderlineObject.final_exam_id = exam_id
             BorderlineObject.final_exam_name = marks_name
             BorderlineObject.final_exam_max_marks = marks
             BorderlineObject.final_exam_weight = weight
@@ -166,16 +168,23 @@ def read_percent_covered(table: Tag) -> float:
     return value
 
 
-def read_final_assessment(table: Tag) -> list[float]:
+def read_final_assessment(table: Tag) -> list:
     raw = read_table_header(table)[0]
     marks = raw[-5:-4][0]
     weight = raw[-4:-3][0]
+
+    link = find_link_in_table(table, marks, marks)
+    if not link:
+        raise Exception("link cannot be null")
+    id = link[link.find("order"):]
+    if id:
+        id = id[id.find("=")+1:]
 
     marks_name = marks.split(" ")[0]
     marks = marks.split("(")[1].split(")")[0]
     weight = weight[0:-1]
 
-    return [float(marks), marks_name, float(weight)]
+    return [id, marks_name, float(marks), float(weight)]
 
 
 def get_course_works(table: Tag):

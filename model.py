@@ -18,6 +18,7 @@ class BorderlineObject:
     final_exam_max_marks = 0.0
     final_exam_weight = 0.0
     final_exam_name = ''
+    final_exam_id = ''
 
     internal_std_no: str
     student_no: str
