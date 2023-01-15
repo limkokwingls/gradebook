@@ -12,6 +12,16 @@ class Module:
 
 
 @dataclass
+class BorderlineMarks:
+    percent_covered = 0.0
+    internal_std_no: str
+    student_no: str
+    names: str
+    final_exam: float
+    total: float
+
+
+@dataclass
 class CourseWork:
     id: str
     name: str

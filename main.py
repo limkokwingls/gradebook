@@ -70,22 +70,22 @@ def try_function(func, *args):
 
 
 def main():
-    while True:
-        module = pick_module()
-        if module == None:
-            break
-        print(f"[bold blue]{str(module)}")
-        _, index = pick([
-            "Upload Marks to CMS",
-            "Fix Border Lines",
-            EXIT_LABEL
-        ], "Pick a Module", indicator='->')
-        if index == 0:
-            marks_upload.main(module)
-        elif index == 1:
-            borderlines.main(module)
-        else:
-            break
+    # while True:
+    module = pick_module()
+    if module == None:
+        exit()
+    print(f"[bold blue]{str(module)}")
+    # _, index = pick([
+    #     "Upload Marks to CMS",
+    #     "Fix Border Lines",
+    #     EXIT_LABEL
+    # ], "Pick a Module", indicator='->')
+    # if index == 0:
+    # marks_upload.main(module)
+    # elif index == 1:
+    borderlines.main(module)
+    # else:
+    # break
 
 
 def clear_screen():
@@ -97,7 +97,7 @@ if __name__ == '__main__':
     while not browser.logged_in:
         try_function(login)
 
-    while True:
+    # while True:
         main()
-        input("\nPress any key to continue...")
-        clear_screen()
+        # input("\nPress any key to continue...")
+        # clear_screen()

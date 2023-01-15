@@ -15,6 +15,8 @@ from rich.prompt import Prompt
 
 
 def main(module: Module):
-    while True:
-        pass
-    print("Borderline")
+    # while True:
+
+    res = browser.read_last_course_work_and_total(module)
+    print(res)
+    # break

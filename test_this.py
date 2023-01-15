@@ -1,15 +1,16 @@
 
-one = {
-    "one": 1,
-    "two": 2,
-    "three": 3
-}
+from dataclasses import dataclass
 
-two = {
-    "four": 4,
-    "five": 5
-}
 
-one.update(two)
+@dataclass
+class Person:
+    race = "Black"
+    name: str
 
-print(one)
+
+Person.race = "Another One"
+one = Person(name="One")
+two = Person(name="Two")
+
+print(one.race)
+print(two.race)
