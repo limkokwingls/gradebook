@@ -31,16 +31,6 @@ def get_marks_for(grades: list[dict[str, str]], student_number: list[tuple[str]]
     return marks
 
 
-def pick_module() -> Module | None:
-    list = browser.get_modules()
-    options = [str(it) for it in list]
-    options.append(EXIT_LABEL)
-    _, index = pick(options, "Pick a Module", indicator='->')
-    if index <= (len(list) - 1):  # type: ignore
-        return list[index]  # type: ignore
-    return None
-
-
 def pick_worksheet(workbook: Workbook) -> Worksheet | None:
     list = workbook.sheetnames
     sheet_name = None
@@ -153,41 +143,35 @@ def create_payloads(course_work: CourseWork,
     }
 
 
-def main():
+def main(module: Module):
     while True:
-        module = pick_module()
-        if module == None:
+        workbook = open_file()
+        sheet = pick_worksheet(workbook)
+        if not sheet:
+            continue
+        cms_std_id, course_works = browser.read_cms_gradebook(module)
+        if not course_works:
+            error_console.print(
+                f"{str(module)} does not have any assessments set, please set assessments first in the CMS")
             break
-        print(f"[bold blue]{str(module)}")
         while True:
-            workbook = open_file()
-            sheet = pick_worksheet(workbook)
-            if not sheet:
-                continue
-            cms_std_id, course_works = browser.read_cms_gradebook(module)
+            course_works = pick_course_works(course_works)  # type: ignore
             if not course_works:
-                error_console.print(
-                    f"{str(module)} does not have any assessments set, please set assessments first in the CMS")
-                break
-            while True:
-                course_works = pick_course_works(course_works)  # type: ignore
-                if not course_works:
-                    continue
-                print(
-                    f"\nReady to read from {sheet.title}, enter column letters for the following:")
-                student_numbers = get_workbook_std_numbers(sheet)
-                marks = get_workbook_marks(course_works, sheet)
-                gradebook = create_gradebook(student_numbers, marks)
+                continue
+            print(
+                f"\nReady to read from {sheet.title}, enter column letters for the following:")
+            student_numbers = get_workbook_std_numbers(sheet)
+            marks = get_workbook_marks(course_works, sheet)
+            gradebook = create_gradebook(student_numbers, marks)
 
-                confirmed = confirm_gradebook(gradebook, course_works)
-                if not confirmed:
-                    continue
+            confirmed = confirm_gradebook(gradebook, course_works)
+            if not confirmed:
+                continue
 
-                size = len(course_works)
-                for i, cw in enumerate(course_works):
-                    payload = create_payloads(cw, gradebook, cms_std_id)
-                    browser.upload_grades(f"{i+1}/{size})", cw, payload)
-                console.print("Done 😃", style="green")
-                break
+            size = len(course_works)
+            for i, cw in enumerate(course_works):
+                payload = create_payloads(cw, gradebook, cms_std_id)
+                browser.upload_grades(f"{i+1}/{size})", cw, payload)
+            console.print("Done 😃", style="green")
             break
         break

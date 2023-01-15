@@ -1,12 +1,17 @@
 import os
+
+from pick import pick
 from credentials import read_credentials, write_credentials
-import marks_uploader
 from rich import print
 from rich.table import Table
 from rich.prompt import Confirm
 from rich.console import Console
 from rich.prompt import Prompt
 from browser import browser
+from model import Module
+from pick_utils import EXIT_LABEL
+import marks_upload
+import borderlines
 
 console = Console()
 error_console = Console(stderr=True, style="bold red")
@@ -41,6 +46,16 @@ def login():
         exit()
 
 
+def pick_module() -> Module | None:
+    list = browser.get_modules()
+    options = [str(it) for it in list]
+    options.append(EXIT_LABEL)
+    _, index = pick(options, "Pick a Module", indicator='->')
+    if index <= (len(list) - 1):  # type: ignore
+        return list[index]  # type: ignore
+    return None
+
+
 def try_function(func, *args):
     retry = True
     results = None
@@ -55,7 +70,22 @@ def try_function(func, *args):
 
 
 def main():
-    marks_uploader.main()
+    while True:
+        module = pick_module()
+        if module == None:
+            break
+        print(f"[bold blue]{str(module)}")
+        _, index = pick([
+            "Upload Marks to CMS",
+            "Fix Border Lines",
+            EXIT_LABEL
+        ], "Pick a Module", indicator='->')
+        if index == 0:
+            marks_upload.main(module)
+        elif index == 1:
+            borderlines.main(module)
+        else:
+            break
 
 
 def clear_screen():
@@ -63,7 +93,7 @@ def clear_screen():
 
 
 if __name__ == '__main__':
-    print("The Thing That Enters Marks into the CMS (0.1.0_dev)\n")
+    print("The thing that automates mundane CMS (gradebook) tasks (0.1.0_dev)\n")
     while not browser.logged_in:
         try_function(login)
 

@@ -84,7 +84,7 @@ class Browser:
             return data
 
     def read_cms_gradebook(self, module):
-        with console.status(f"Loading Students..."):
+        with console.status(f"Reading CMS Gradebook..."):
             res = self.session.get(urls.student_numbers(module))
             soup = BeautifulSoup(res.text, PARSER)
             table = soup.select_one("#ewlistmain")
