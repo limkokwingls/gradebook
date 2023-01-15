@@ -19,12 +19,12 @@ def main(module: Module):
 
     list = browser.read_borderline_objects(module)
     for it in list:
-        cw = full_coursework_name(it.final_exam_name)
+        cw = full_coursework_name(it.final_assessment.name)
         _, index = pick([
             f"Add {it.tipping_value()} to {cw}",
             f"Deduct {it.tipping_value()} from {cw}",
             "Do Nothing"
-        ], f"Address borderline marks for '{it.names}'\n{cw}: {it.final_exam_marks}/{it.final_exam_max_marks}\nTotal: {it.total}",
+        ], f"Address borderline marks for '{it.names}'\n{cw}: {it.final_exam_marks}/{it.final_assessment.max_marks}\nTotal: {it.total}",
             indicator='->')
         if index == 0:
             it.increase()

@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 import math
+from turtle import width
 
 
 @dataclass
@@ -13,18 +14,27 @@ class Module:
 
 
 @dataclass
+class FinalAssessment:
+    id: str
+    name: str
+    max_marks: float
+    weight: float
+
+
+@dataclass
 class BorderlineObject:
     percent_covered = 0.0
-    final_exam_max_marks = 0.0
-    final_exam_weight = 0.0
-    final_exam_name = ''
-    final_exam_id = ''
-
     internal_std_no: str
     student_no: str
     names: str
     final_exam_marks: float
     total: float
+    final_assessment = FinalAssessment(
+        id='',
+        name='',
+        max_marks=0.0,
+        weight=0.0,
+    )
 
     def is_borderline(self):
         if self.total >= 44:
@@ -44,7 +54,7 @@ class BorderlineObject:
         """
         The value that can change overall weight by one point
         """
-        value = self.final_exam_max_marks / self.final_exam_weight
+        value = self.final_assessment.max_marks / self.final_assessment.weight
         return math.ceil(value)
 
 

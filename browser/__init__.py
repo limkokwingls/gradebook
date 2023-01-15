@@ -1,7 +1,7 @@
 import re
 from bs4 import BeautifulSoup
 import requests
-from model import BorderlineObject, CourseWork, Module
+from model import BorderlineObject, CourseWork, FinalAssessment, Module
 import urls
 from rich.console import Console
 from bs4 import Tag
@@ -120,12 +120,9 @@ class Browser:
             table_data = read_table(table)
 
             BorderlineObject.percent_covered = read_percent_covered(table)
-            exam_id, marks_name, marks, weight = read_final_assessment(table)
+            final_assessment = read_final_assessment(table)
 
-            BorderlineObject.final_exam_id = exam_id
-            BorderlineObject.final_exam_name = marks_name
-            BorderlineObject.final_exam_max_marks = marks
-            BorderlineObject.final_exam_weight = weight
+            BorderlineObject.final_assessment = final_assessment
             result = []
             for it in table_data:
                 try:
@@ -168,7 +165,7 @@ def read_percent_covered(table: Tag) -> float:
     return value
 
 
-def read_final_assessment(table: Tag) -> list:
+def read_final_assessment(table: Tag) -> FinalAssessment:
     raw = read_table_header(table)[0]
     marks = raw[-5:-4][0]
     weight = raw[-4:-3][0]
@@ -184,7 +181,12 @@ def read_final_assessment(table: Tag) -> list:
     marks = marks.split("(")[1].split(")")[0]
     weight = weight[0:-1]
 
-    return [id, marks_name, float(marks), float(weight)]
+    return FinalAssessment(
+        id=id,
+        name=marks_name,
+        max_marks=float(marks),
+        weight=float(weight)
+    )
 
 
 def get_course_works(table: Tag):
