@@ -6,12 +6,23 @@ from console_utils import print_in_table
 from credentials import read_credentials, write_credentials
 from excel_reader import find_marks_column, find_student_column, open_file, read_numeric_column
 from openpyxl.worksheet.worksheet import Worksheet
-from model import CourseWork, Module, full_coursework_name
+from model import BorderlineObject, CourseWork, FinalAssessment, Module, full_coursework_name
 from rich import print
 from rich.table import Table
 from rich.prompt import Confirm
 from rich.console import Console
 from rich.prompt import Prompt
+
+
+def confirm_gradebook(objects: list[BorderlineObject], final_ass: FinalAssessment):
+    data = {}
+    data["Student No."] = [it.student_no for it in objects]
+    data[full_coursework_name(final_ass.name)] = [
+        str(it.total) for it in objects]
+
+    print_in_table(data, "Ready to upload to CMS")
+
+    return Confirm.ask("Proceed?", default=True)
 
 
 def main(module: Module):
@@ -30,4 +41,4 @@ def main(module: Module):
             it.increase()
         elif index == 1:
             it.decrease()
-    print(list)
+    confirm_gradebook(list, BorderlineObject.final_assessment)
