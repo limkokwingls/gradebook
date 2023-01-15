@@ -156,3 +156,6 @@ def find_course_work_id(table: Tag, course_work: str) -> str:
                         id = link[link.find("order"):]
                         id = id[id.find("=")+1:]
     return id
+
+
+browser = Browser()

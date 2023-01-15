@@ -9,12 +9,15 @@ def multiple_pick(options: list, title="Select at least one item"):
     retry = True
 
     while retry:
-        selected = pick(
-            options,
-            title,
-            indicator='->',
-            multiselect=True,
-        )
+        try:
+            selected = pick(
+                options,
+                title,
+                indicator='->',
+                multiselect=True,
+            )
+        except:
+            ...
         if selected:
             retry = False
         else:
