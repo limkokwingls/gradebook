@@ -1,11 +1,11 @@
 import re
 from bs4 import BeautifulSoup
 import requests
-from model import BorderlineMarks, CourseWork, Module
+from model import BorderlineObject, CourseWork, Module
 import urls
 from rich.console import Console
 from bs4 import Tag
-from html_utils import find_link_in_table, read_table
+from browser.html_utils import find_link_in_table, read_table
 import subprocess
 from rich import print
 
@@ -110,7 +110,7 @@ class Browser:
                         f"\nMarks will not be updated for {it[3]} ({it[4]}) in the CMS")
         return [id_dict, course_works]
 
-    def read_last_course_work_and_total(self, module: Module):
+    def read_borderline_objects(self, module: Module) -> list[BorderlineObject]:
         with console.status(f"Reading CMS Gradebook..."):
             res = self.session.get(urls.student_numbers(module))
             soup = BeautifulSoup(res.text, PARSER)
@@ -119,7 +119,11 @@ class Browser:
                 raise Exception("table cannot be null")
             table_data = read_table(table)
 
-            BorderlineMarks.percent_covered = read_percent_covered(table)
+            BorderlineObject.percent_covered = read_percent_covered(table)
+            marks, marks_name, weight = read_final_assessment(table)
+            BorderlineObject.final_exam_name = marks_name
+            BorderlineObject.final_exam_max_marks = marks
+            BorderlineObject.final_exam_weight = weight
             result = []
             for it in table_data:
                 try:
@@ -132,14 +136,15 @@ class Browser:
                     final_exam = it[-6:-5][0]
                     total = it[-4:-3][0]
                     if is_number(final_exam) and is_number(total):
-                        obj = BorderlineMarks(
+                        obj = BorderlineObject(
                             internal_std_no=id,
                             student_no=it[4:5][0],
                             names=it[3:4][0],
-                            final_exam=float(final_exam),
+                            final_exam_marks=float(final_exam),
                             total=float(total)
                         )
-                        result.append(obj)
+                        if obj.is_borderline():
+                            result.append(obj)
                 except:
                     error_console.print(
                         f"\nMarks will not be updated for {it[3]} ({it[4]}) in the CMS")
@@ -155,11 +160,22 @@ def read_percent_covered(table: Tag) -> float:
                 try:
                     s = re.findall(r"\(([^)]+)\)", it)
                     s = s[0][0:-1]
-                    s = float(s[0])
-                    return s
+                    return float(s)
                 except:
                     ...
     return value
+
+
+def read_final_assessment(table: Tag) -> list[float]:
+    raw = read_table_header(table)[0]
+    marks = raw[-5:-4][0]
+    weight = raw[-4:-3][0]
+
+    marks_name = marks.split(" ")[0]
+    marks = marks.split("(")[1].split(")")[0]
+    weight = weight[0:-1]
+
+    return [float(marks), marks_name, float(weight)]
 
 
 def get_course_works(table: Tag):

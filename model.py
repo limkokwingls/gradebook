@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+import math
 
 
 @dataclass
@@ -12,13 +13,38 @@ class Module:
 
 
 @dataclass
-class BorderlineMarks:
+class BorderlineObject:
     percent_covered = 0.0
+    final_exam_max_marks = 0.0
+    final_exam_weight = 0.0
+    final_exam_name = ''
+
     internal_std_no: str
     student_no: str
     names: str
-    final_exam: float
+    final_exam_marks: float
     total: float
+
+    def is_borderline(self):
+        if self.total >= 44:
+            s = str(self.total)
+            if "." in s:
+                s = s.split(".")[0]
+            return s == '48' or s.endswith("9") or s.endswith("4")
+        return False
+
+    def increase(self):
+        self.final_exam_marks += self.tipping_value()
+
+    def decrease(self):
+        self.final_exam_marks -= self.tipping_value()
+
+    def tipping_value(self):
+        """
+        The value that can change overall weight by one point
+        """
+        value = self.final_exam_max_marks / self.final_exam_weight
+        return math.ceil(value)
 
 
 @dataclass
@@ -30,38 +56,39 @@ class CourseWork:
         return self.fullname()
 
     def fullname(self):
-        fullname = ''
-        number = ''
+        return full_coursework_name(self.name)
 
-        name = self.name
 
-        try:
-            name = name.split("(")[0].strip()
-            if has_numbers(name):
-                number = f" {name[-1]}"
-        except:
-            ...
+def full_coursework_name(name: str):
+    fullname = ''
+    number = ''
+    try:
+        name = name.split("(")[0].strip()
+        if has_numbers(name):
+            number = f" {name[-1]}"
+    except:
+        ...
 
-        if name.startswith("LabT"):
-            fullname = "Lab Test"
-        elif name.startswith("CTst"):
-            fullname = "Class Test"
-        elif name.startswith("Ass"):
-            fullname = "Assignment"
-        elif name.startswith("MTT"):
-            fullname = "MidTerm"
-        elif name.startswith("GAss"):
-            fullname = "Group Assignment"
-        elif name.startswith("GPro"):
-            fullname = "Group Project"
-        elif name.startswith("Excs"):
-            fullname = "Exercises"
-        elif name.startswith("FExm"):
-            fullname = "Final Exam"
-        else:
-            fullname = name
+    if name.startswith("LabT"):
+        fullname = "Lab Test"
+    elif name.startswith("CTst"):
+        fullname = "Class Test"
+    elif name.startswith("Ass"):
+        fullname = "Assignment"
+    elif name.startswith("MTT"):
+        fullname = "MidTerm"
+    elif name.startswith("GAss"):
+        fullname = "Group Assignment"
+    elif name.startswith("GPro"):
+        fullname = "Group Project"
+    elif name.startswith("Excs"):
+        fullname = "Exercises"
+    elif name.startswith("FExm"):
+        fullname = "Final Exam"
+    else:
+        fullname = name
 
-        return fullname + number
+    return fullname + number
 
 
 def has_numbers(inputString):

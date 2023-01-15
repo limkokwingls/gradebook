@@ -1,16 +1,7 @@
 
-from dataclasses import dataclass
+final = """Hello my name is
+And...
+           Child of the one true king
+"""
 
-
-@dataclass
-class Person:
-    race = "Black"
-    name: str
-
-
-Person.race = "Another One"
-one = Person(name="One")
-two = Person(name="Two")
-
-print(one.race)
-print(two.race)
+print(final)
