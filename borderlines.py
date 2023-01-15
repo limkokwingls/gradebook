@@ -25,6 +25,17 @@ def confirm_gradebook(objects: list[BorderlineObject], final_ass: FinalAssessmen
     return Confirm.ask("Proceed?", default=True)
 
 
+def create_payload(objects: list[BorderlineObject]):
+
+    marks = [it.total for it in objects]
+    ids = [it.internal_std_no for it in objects]
+
+    return {
+        "x_StdModuleID[]": ids,
+        f'x_{BorderlineObject.final_assessment.id}[]': marks
+    }
+
+
 def main(module: Module):
     # while True:
 
@@ -41,4 +52,8 @@ def main(module: Module):
             it.increase()
         elif index == 1:
             it.decrease()
-    confirm_gradebook(list, BorderlineObject.final_assessment)
+    confirmed = confirm_gradebook(list, BorderlineObject.final_assessment)
+    if confirmed:
+        cw = CourseWork(id=BorderlineObject.final_assessment.id,
+                        name=BorderlineObject.final_assessment.name)
+        browser.upload_grades("1/1)", cw, create_payload(list))
