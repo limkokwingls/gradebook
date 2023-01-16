@@ -39,42 +39,6 @@ def read_numeric_column(sheet: Worksheet, col: str) -> list[str]:
             result.append(str(it))
     return result
 
-# TODO: Remember to delete this function
-
-
-def old_read_grades(sheet: Worksheet, course_work: CourseWork) -> list[dict[str, str]]:
-    result = []
-    student_col = find_student_column(sheet)
-    marks_col = find_marks_column(sheet, course_work.fullname())
-
-    while True:
-        student_col = Prompt.ask("Student No Column", default=student_col)
-        marks_col = Prompt.ask(
-            f"{course_work} Marks Column", default=marks_col)
-        if (not student_col) or (not marks_col) or student_col.isalpha() or marks_col.isalpha():
-            break
-        error_console.print("Column should be an alphabet")
-
-    marks = list([it.value for it in sheet[marks_col]])
-
-    grades_book = list(zip(student_numbers, marks))
-
-    for grade in grades_book:
-        if is_number(grade[0]) and is_number(grade[1]):
-            result.append(
-                {str(int(float(grade[0]))): int(float(grade[1]))})
-
-    keys = [str(list(it.keys())[0]) for it in result]
-    values = [str(list(it.values())[0]) for it in result]
-
-    print_in_table({
-        "Student No": keys,
-        "Marks": values,
-    }, ""
-    )
-
-    return result
-
 
 def find_marks_column(sheet: Worksheet, course_work: str):
     for col in sheet.iter_cols():

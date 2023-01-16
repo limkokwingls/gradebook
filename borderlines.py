@@ -44,7 +44,9 @@ def pick_and_act(objects: list[BorderlineObject]):
         f"Increase {cw} with {objects[0].tipping_value()} marks for all students",
         f"Decrease {cw} with {objects[0].tipping_value()} marks for all students",
         "Address each student individually",
-        EXIT_LABEL], f"Found {len(objects)} students with borderline issues")
+        EXIT_LABEL],
+        f"Found {len(objects)} students with borderline issues",
+        indicator="->")
     match index:
         case 0:
             for obj in objects:
@@ -59,7 +61,8 @@ def pick_and_act(objects: list[BorderlineObject]):
                     f"Increase {cw} with {it.tipping_value()} marks",
                     f"Decrease {cw} with {it.tipping_value()} marks",
                     "Skip"
-                ], f"{i+1}/{len(objects)}) {it.names}\n{cw}: {it.final_exam_marks}/{it.final_assessment.max_marks}\nTotal: {it.total}",
+                ],
+                    f"{i+1}/{len(objects)}) {it.names}\n{cw}: {it.final_exam_marks}/{it.final_assessment.max_marks}\nTotal: {it.total}",
                     indicator='->')
                 if index == 0:
                     it.increase()
