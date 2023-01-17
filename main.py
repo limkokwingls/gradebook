@@ -83,7 +83,7 @@ def main():
     # if index == 0:
     # marks_upload.main(module)
     # elif index == 1:
-    borderlines.main(module)
+    # borderlines.main(module)
     # else:
     # break
 
