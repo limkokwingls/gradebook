@@ -2,7 +2,7 @@ import re
 from bs4 import BeautifulSoup
 import requests
 from model import BorderlineObject, CourseWork, FinalAssessment, Module, Student
-import urls as urls
+import urls
 from rich.console import Console
 from bs4 import Tag
 from browser.html_utils import find_link_in_table, read_table
