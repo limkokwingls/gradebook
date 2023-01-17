@@ -1,8 +1,8 @@
 import re
 from bs4 import BeautifulSoup
 import requests
-from model import BorderlineObject, CourseWork, FinalAssessment, Module
-import urls
+from model import BorderlineObject, CourseWork, FinalAssessment, Module, Student
+import urls as urls
 from rich.console import Console
 from bs4 import Tag
 from browser.html_utils import find_link_in_table, read_table
@@ -148,6 +148,34 @@ class Browser:
                     error_console.print(
                         f"\nMarks will not be updated for {it[3]} ({it[4]}) in the CMS")
         return result
+
+    def get_class_list(self) -> list[Student]:
+        with console.status(f"Loading Modules..."):
+            res = self.session.get(urls.modules())
+            soup = BeautifulSoup(res.text, PARSER)
+            table = soup.select_one(".ewReportTable")
+            if not table:
+                raise Exception("table cannot be null")
+            table_data = read_table(table)
+            module, class_name = '', ''
+            data = []
+            for it in table_data:
+                if it and it[0] == 'Module:':
+                    module = it[1]
+                elif it and it[0] == 'Class:':
+                    class_name = it[1]
+
+                if it and it[0].isnumeric():
+                    std = Student(
+                        id=None,
+                        std_no=it[0],
+                        names=it[1],
+                        class_name="-".join(class_name.split('-')[1:]),
+                        module_code=module.split()[:1][0],
+                        module_name=" ".join(module.split()[1:])
+                    )
+                    data.append(std)
+            return data
 
 
 def read_percent_covered(table: Tag) -> float:

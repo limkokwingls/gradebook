@@ -22,6 +22,10 @@ def grade_books(module: Module):
     return f"{_url}/f_breakdownmarksviewlist_new.php?showmaster=1&RecPerPage=500&ModuleID={module.id}"
 
 
+def class_list(module: Module):
+    return f"{_url}/ClassListModreport.php?showmaster=1&ModuleID={module.id}"
+
+
 def course_work_page(course_work: str):
     return f"{_url}/f_breakdownmarksviewlist_new.php?a=edit&w={course_work.lower()}"
 

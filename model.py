@@ -4,6 +4,16 @@ from turtle import width
 
 
 @dataclass
+class Student:
+    id: str | None
+    std_no: str
+    names: str
+    class_name: str
+    module_code: str | None
+    module_name: str | None
+
+
+@dataclass
 class Module:
     id: str
     code: str
