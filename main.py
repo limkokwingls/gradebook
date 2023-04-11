@@ -1,17 +1,16 @@
 import os
 
 from pick import pick
-from credentials import read_credentials, write_credentials
 from rich import print
-from rich.table import Table
-from rich.prompt import Confirm
 from rich.console import Console
-from rich.prompt import Prompt
+from rich.prompt import Confirm, Prompt
+from rich.table import Table
+
+import marks_upload
 from browser import browser
+from credentials import read_credentials, write_credentials
 from model import Module
 from pick_utils import EXIT_LABEL
-import marks_upload
-import borderlines
 
 console = Console()
 error_console = Console(stderr=True, style="bold red")
@@ -50,7 +49,7 @@ def pick_module() -> Module | None:
     list = browser.get_modules()
     options = [str(it) for it in list]
     options.append(EXIT_LABEL)
-    _, index = pick(options, "Pick a Module", indicator='->')
+    _, index = pick(options, "Pick a Module", indicator="->")
     if index <= (len(list) - 1):  # type: ignore
         return list[index]  # type: ignore
     return None
@@ -81,7 +80,7 @@ def main():
     #     EXIT_LABEL
     # ], "Pick a Module", indicator='->')
     # if index == 0:
-    # marks_upload.main(module)
+    marks_upload.main(module)
     # elif index == 1:
     # borderlines.main(module)
     # else:
@@ -89,15 +88,15 @@ def main():
 
 
 def clear_screen():
-    os.system('cls' if os.name == 'nt' else 'clear')
+    os.system("cls" if os.name == "nt" else "clear")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     print("The thing that automates mundane CMS (gradebook) tasks (0.1.0_dev)\n")
     while not browser.logged_in:
         try_function(login)
 
-    # while True:
+        # while True:
         main()
         # input("\nPress any key to continue...")
         # clear_screen()
