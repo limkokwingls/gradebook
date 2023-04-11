@@ -1,7 +1,8 @@
 from types import NoneType
 
 
-def to_int(value): return int(float(value))
+def to_int(value):
+    return int(float(value))
 
 
 def is_number(s):
@@ -9,6 +10,6 @@ def is_number(s):
         return False
     try:
         float(s)
-    except ValueError:
+    except Exception:
         return False
     return True
