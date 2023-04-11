@@ -66,9 +66,8 @@ class Browser:
             payload.update(grade_payload)
             payload["cw"] = course_work.id.lower()
 
-            # print(payload)
+            res = self.session.post(urls.course_work_upload(), payload)
 
-            # res = self.session.post(urls.course_work_upload(), payload)
             # print(payload)
             # subprocess.run("clip", text=True, input=res.text)
 
