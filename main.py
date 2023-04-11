@@ -96,7 +96,7 @@ if __name__ == "__main__":
     while not browser.logged_in:
         try_function(login)
 
-        # while True:
-        main()
-        # input("\nPress any key to continue...")
-        # clear_screen()
+        while True:
+            main()
+            input("\nPress any key to continue...")
+            clear_screen()
