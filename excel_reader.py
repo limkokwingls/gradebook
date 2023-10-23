@@ -1,26 +1,25 @@
+import tkinter as tk
 from pathlib import Path
-from types import NoneType
+from tkinter import filedialog
 
 import openpyxl
 from openpyxl import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
 from rich.console import Console
-from rich.prompt import Prompt
 
-from console_utils import print_in_table
-from model import CourseWork
 from utils import is_number
 
 error_console = Console(stderr=True, style="bold red")
+
+root = tk.Tk()
+root.withdraw()
 
 
 def open_file() -> Workbook:
     workbook: Workbook | None = None
     while workbook == None:
         try:
-            file_path = Prompt.ask(
-                "RAW Mark-sheet", default="C:\\Users\\Temp\\Desktop\\test.xlsx"
-            )
+            file_path = filedialog.askopenfilename()
             file_path = file_path.strip('"')
             if Path(file_path).is_file():
                 workbook = openpyxl.load_workbook(file_path)
