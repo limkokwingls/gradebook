@@ -6,6 +6,7 @@ import openpyxl
 from openpyxl import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
 from rich.console import Console
+from rich.prompt import Confirm, Prompt
 
 from utils import is_number
 
@@ -15,12 +16,16 @@ root = tk.Tk()
 root.withdraw()
 
 
-def open_file() -> Workbook:
+def open_file() -> Workbook | None:
     workbook: Workbook | None = None
     while workbook == None:
         try:
             file_path = filedialog.askopenfilename()
             file_path = file_path.strip('"')
+            if file_path == "":
+                retry = Confirm.ask("No file selected. Try again?")
+                if not retry:
+                    break
             if Path(file_path).is_file():
                 workbook = openpyxl.load_workbook(file_path)
         except Exception as e:

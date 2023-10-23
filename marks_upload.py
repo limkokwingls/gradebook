@@ -150,6 +150,8 @@ def create_payloads(
 def main(module: Module):
     while True:
         workbook = open_file()
+        if not workbook:
+            break
         sheet = pick_worksheet(workbook)
         if not sheet:
             continue

@@ -92,7 +92,7 @@ def clear_screen():
 
 
 if __name__ == "__main__":
-    print("The thing that automates mundane CMS (gradebook) tasks (0.1.1_dev)\n")
+    print("The thing that automates mundane CMS (gradebook) tasks (0.2.0)\n")
     while not browser.logged_in:
         try_function(login)
 
